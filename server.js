@@ -9,7 +9,7 @@ const morgan = require('morgan');
 const chalk = require('chalk');
 
 // Include errors
-const ApiError = require('./error/ApiError');
+const ApiError = require('./errors/ApiError');
 
 // Initializing the database connection
 const sql = require('./config/db');
@@ -44,15 +44,15 @@ app.use('*', (req, res, next) => {
     let httpMethod = req.method; //Type of request
     let requestUrl = req.baseUrl; //URL of request
 
-    //Sending error info to the Final error Handler
+    //Sending errors info to the Final errors Handler
     next(new ApiError(404, 'Endpoint could not be found'));
     });
 
-//Final error Handler for for Next(Info)
+//Final errors Handler for for Next(Info)
 app.use((err, req, res, next) => {
    console.log(chalk.red('[ERROR]    FINAL ERROR HANDLER ' + '(' + err.status + '): ' + err.message));
 
-    //Responding to the error
+    //Responding to the errors
     res.status(err.status).json(err).end(); //STATUS CODE 500 GELDT NIET ALTIJD!
 });
 
