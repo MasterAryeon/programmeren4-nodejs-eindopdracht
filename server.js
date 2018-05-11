@@ -6,6 +6,10 @@
 const express = require('express');
 const bodyparser = require('body-parser');
 const morgan = require('morgan');
+const chalk = require('chalk');
+
+// Initializing the database connection
+const sql = require('./config/db');
 
 // Include all configs
 const config = require("./config/config");
@@ -61,5 +65,5 @@ app.use((err, req, res, next) => {
 
 // Start the server on given port
 app.listen(port, () => {
-    console.log('Server is running on port: ' + port);
+    console.log(chalk.green('[SERVER]   Server is running on port: ' + port));
 });
