@@ -8,6 +8,9 @@ const bodyparser = require('body-parser');
 const morgan = require('morgan');
 const chalk = require('chalk');
 
+// Include errors
+const ApiError = require('./error/ApiError');
+
 // Initializing the database connection
 const sql = require('./config/db');
 
@@ -29,7 +32,7 @@ app.use(bodyparser.json());
 app.use('*', (req, res, next) => {
     let httpMethod = req.method; //Type of request
     let requestUrl = req.baseUrl; //URL of request
-    console.log('A ' + httpMethod + ' has been made at ' + requestUrl);
+    console.log(chalk.yellow('[REQUEST]  A ' + httpMethod + ' request has been made at ' + requestUrl));
 
     next();
 });
@@ -40,27 +43,17 @@ app.use('/api', PLACEHOLDER_routes);
 app.use('*', (req, res, next) => {
     let httpMethod = req.method; //Type of request
     let requestUrl = req.baseUrl; //URL of request
-    console.log('A ' + httpMethod + ' has been made at ' + requestUrl);
 
     //Sending error info to the Final error Handler
-    next('ERROR 404: Endpoint does not exist');
+    next(new ApiError(404, 'Endpoint could not be found'));
     });
 
 //Final error Handler for for Next(Info)
 app.use((err, req, res, next) => {
-   console.log('FINAL ERROR HANDLER: An error occurred');
-   console.log(err.toString());
-   let requestUrl = req.baseUrl;
-
-   //Creating a response for errors
-
-    const error = {
-        error: err.toString(),
-        url: requestUrl
-    };
+   console.log(chalk.red('[ERROR]    FINAL ERROR HANDLER ' + '(' + err.status + '): ' + err.message));
 
     //Responding to the error
-    res.status(500).json(error).end(); //STATUS CODE 500 GELDT NIET ALTIJD!
+    res.status(err.status).json(err).end(); //STATUS CODE 500 GELDT NIET ALTIJD!
 });
 
 // Start the server on given port
