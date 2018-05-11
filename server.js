@@ -7,6 +7,9 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const morgan = require('morgan');
 
+// Initializing the database connection
+const sql = require('./config/db');
+
 // Include all configs
 const config = require("./config/config");
 
