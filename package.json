@@ -1,0 +1,37 @@
+{
+  "name": "programmeren4-nodejs-eindopdracht",
+  "version": "1.0.0",
+  "description": "A fully fleshed NodeJS server for the programming 4 course",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MasterAryeon/programmeren4-nodejs-eindopdracht.git"
+  },
+  "keywords": [
+    "Programmeren",
+    "NodeJS"
+  ],
+  "author": "Aron Cornet - Rick Hamers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MasterAryeon/programmeren4-nodejs-eindopdracht/issues"
+  },
+  "homepage": "https://github.com/MasterAryeon/programmeren4-nodejs-eindopdracht#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "jwt-simple": "^0.5.1",
+    "moment": "^2.22.1",
+    "morgan": "^1.9.0",
+    "mssql": "^4.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "mocha": "^5.1.1",
+    "nodemon": "^1.17.4"
+  }
+}
