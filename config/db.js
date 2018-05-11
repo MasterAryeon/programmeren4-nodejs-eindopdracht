@@ -1,6 +1,7 @@
 // Include necessary modules
 const sql = require('mssql');
 const config = require('./config');
+const chalk = require('chalk');
 
 // Initiate the connectionPool object with environment variables
 const connection = new sql.ConnectionPool({
@@ -14,10 +15,11 @@ const connection = new sql.ConnectionPool({
 // Connect the pool and handle any errors occuring
 connection.connect(err => {
     if(err) {
-        console.log(err.message);
-        sqlMessage = 'Could not connect to backend database';
+        console.log(chalk.red(err.message));
+        sqlMessage = '[MSSQL]   Could not connect to backend database';
+
     } else {
-        console.log('Successfully connected to the database');
+        console.log(chalk.green('[MSSQL]    Successfully connected to the database'));
         sqlConnected = true;
         sqlMessage = 'Successfully connected to the database';
     }
