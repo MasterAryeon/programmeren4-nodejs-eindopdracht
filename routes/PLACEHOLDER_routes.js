@@ -12,3 +12,5 @@ let routes = express.Router();
 //The GET personList request
 routes.get('/PLACEHOLDER', PLACEHOLDERController.getPLACEHOLDER);
 
+module.exports = routes;
+

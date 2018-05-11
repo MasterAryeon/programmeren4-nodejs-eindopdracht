@@ -51,7 +51,7 @@ app.use((err, req, res, next) => {
    //Creating a response for errors
 
     const error = {
-        error: error.toString(),
+        error: err.toString(),
         url: requestUrl
     };
 
