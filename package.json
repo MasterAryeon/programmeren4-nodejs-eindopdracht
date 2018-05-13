@@ -4,6 +4,7 @@
   "description": "A fully fleshed NodeJS server for the programming 4 course",
   "main": "server.js",
   "scripts": {
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,11 +23,14 @@
   "homepage": "https://github.com/MasterAryeon/programmeren4-nodejs-eindopdracht#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "chalk": "^2.4.1",
     "express": "^4.16.3",
     "jwt-simple": "^0.5.1",
     "moment": "^2.22.1",
     "morgan": "^1.9.0",
-    "mssql": "^4.1.0"
+    "mssql": "^4.1.0",
+    "sha.js": "^2.4.11",
+    "tedious": "^2.2.4"
   },
   "devDependencies": {
     "chai": "^4.1.2",
