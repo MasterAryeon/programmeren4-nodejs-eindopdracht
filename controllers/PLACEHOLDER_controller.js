@@ -2,18 +2,22 @@
     PLACEHOLDER_controller.js   -   Controller for the requests
  */
 
+const sql = require('mssql');
+const config = require('../config/config');
+const ApiError = require('../errors/ApiError');
+const chalk = require('chalk');
 
 //CONTENT PLACEHOLDER
 let placeHolder = 'This is a placeholder for the upcoming content';
 
 module.exports = {
 
-    getPLACEHOLDER(req, res, next){
+    getPLACEHOLDER(request, response, next){
         console.log('---------------A GET request was made---------------');
         console.log('------------------GET PLACEHOLDER-------------------');
-        res.status(200).json(placeHolder).end(); //Response to the GET request
+        response.status(200).json({
+            status: 200,
+            message: placeHolder
+        }).end();
     },
-}
-
-
-;
+};
