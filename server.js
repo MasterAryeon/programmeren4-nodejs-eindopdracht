@@ -60,3 +60,9 @@ app.listen(port, () => {
     console.log(chalk.green('[SERVER]   Server is running on port: ' + port));
 });
 //----------------------------------------------------------------
+
+//
+//  Exporting the server for testing purposes
+//
+module.exports = app;
+//----------------------------------------------------------------
