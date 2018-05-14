@@ -48,7 +48,7 @@ app.all('*', AuthController.validateToken);
 
 // Parse all the defined endpoints that are being provided by this server
 app.use('/api/studentenhuis', studentenhuis_routes);
-app.use('/api/studentenhuis/:id/maaltijd', maaltijd_routes);
+app.use('/api/studentenhuis', maaltijd_routes);
 
 //Error handling - Endpoint handling routing and final error destination handling
 app.use('*', error_routes);
