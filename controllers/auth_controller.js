@@ -38,36 +38,34 @@ module.exports = {
                 statement.input('email', sql.NVarChar(32));
                 statement.input('password', sql.NVarChar(100));
 
-                statement.prepare('SELECT * FROM account WHERE email = @email AND password = @password;').then(s => {
+                statement.prepare('EXEC loginAccount @email, @password;').then(s => {
                    s.execute({
                        email: email,
                        password: auth.hashPassword(password)
                    }).then(result => {
                        s.unprepare();
 
-                       if(result.recordset.length > 0) {
-                           console.log(chalk.green('[MSSQL]    Succesvolle login met email: ' + email));
+                       if(result.recordset[0].result === 1) {
                            const token = auth.encodeToken(email);
-
                            response.status(200).json({
                                token: token,
                                email: email
                            }).end();
                        } else {
                            console.log(chalk.red('[MSSQL]    Niet geautoriseerd (geen valid token) met email: ' + email));
-                           response.status(401).json(new ApiError(401, 'Niet geautoriseerd (geen valid token)')).end();
+                           next(new ApiError(401, 'Niet geautoriseerd (geen valid token)'));
                        }
-                       }).catch( err => {
-                       console.log(chalk.red('[MSSQL]    ' + err.message));
-                       response.status(500).json(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw')).end();
+                   }).catch( err => {
+                   console.log(chalk.red('[MSSQL]    ' + err.message));
+                   next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
                    });
                 }).catch(err => {
                     console.log(chalk.red('[MSSQL]    ' + err.message));
-                    response.status(500).json(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw')).end();
+                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
                 });
             }).catch(err => {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
-                response.status(500).json(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw')).end();
+                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
         } catch(error) {
             next(new ApiError(412, error.message));
