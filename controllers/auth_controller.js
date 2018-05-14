@@ -74,73 +74,59 @@ module.exports = {
 
     register(request, response, next) {
         try {
-            const username = request.body.username || '';
+            const email = request.body.email || '';
             const password = request.body.password || '';
             const firstname = request.body.firstname || '';
             const lastname = request.body.lastname || '';
 
-            assert(username !== '', 'Username was not defined or passed as empty');
-            assert(password !== '', 'Password was not defined or passed as empty');
-            assert(firstname !== '', 'Firstname was not defined or passed as empty');
-            assert(lastname !== '', 'Lastname was not defined or passed as empty');
+            assert(email !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(password !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(firstname !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(lastname !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
 
-            assert(typeof(username) === 'string', 'Username is not of type string');
-            assert(typeof(password) === 'string', 'Password is not of type string');
-            assert(typeof(firstname) === 'string', 'Firstname is not of type string');
-            assert(typeof(lastname) === 'string', 'Lastname is not of type string');
+            assert(typeof(email) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(typeof(password) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(typeof(firstname) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(typeof(lastname) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
 
-                const checkStatement = new sql.PreparedStatement(connection);
-                checkStatement.input('username', sql.NVarChar(30));
-                checkStatement.prepare('SELECT * FROM account WHERE username = @username;').then(cs => {
-                    cs.execute({
-                        username: username
+                const statement = new sql.PreparedStatement(connection);
+                statement.input('email', sql.NVarChar(32));
+                statement.input('password', sql.NVarChar(100));
+                statement.input('firstname', sql.NVarChar(32));
+                statement.input('lastname', sql.NVarChar(32));
+                statement.prepare('EXEC registerAccount @email, @password, @firstname, @lastname;').then(s => {
+                    s.execute({
+                        email: email,
+                        password: auth.hashPassword(password),
+                        firstname: firstname,
+                        lastname: lastname
                     }).then(result => {
-                        cs.unprepare();
-                        if(result.recordset.length === 0) {
-                            const insertStatement = new sql.PreparedStatement(connection);
-                            insertStatement.input('username', sql.NVarChar(30));
-                            insertStatement.input('password', sql.NVarChar(100));
-                            insertStatement.input('firstname', sql.NVarChar(20));
-                            insertStatement.input('lastname', sql.NVarChar(20));
-                            insertStatement.prepare('INSERT INTO account (username, password, firstname, lastname, date_of_birth, date_of_creation) VALUES (@username, @password, @firstname, @lastname, GETDATE(), GETDATE());').then(is => {
-                                is.execute({
-                                    username: username,
-                                    password: auth.hashPassword(password),
-                                    firstname: firstname,
-                                    lastname: lastname
-                                }).then(result => {
-                                    is.unprepare();
-                                    console.log(chalk.green('[MSSQL1]    ' + 'Successfully created an account'));
-                                    response.status(200).json({
-                                        status: 200,
-                                        message: 'Successfully created an account'
-                                    }).end();
-                                }).catch(err => {
-                                    console.log(chalk.red('[MSSQL]    ' + err.message));
-                                    response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
-                                });
-                            }).catch(err => {
-                                console.log(chalk.red('[MSSQL]    ' + err.message));
-                                response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
-                            });
+                        s.unprepare();
+
+                        if(result.recordset[0].result === 1) {
+                            const token = auth.encodeToken(email);
+                            response.status(200).json({
+                                token: token,
+                                email: email
+                            }).end();
                         } else {
-                            console.log(chalk.red('[MSSQL]    ' + 'An account with that username already exists'));
-                            response.status(500).json(new ApiError(500, 'An account with that username already exists')).end();
+                            console.log(chalk.red('[MSSQL]    ' + 'Een gebruiker met dit email adres bestaat al.'));
+                            next(new ApiError(406, 'Een gebruiker met dit email adres bestaat al.'));
                         }
                     }).catch(err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
-                        response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
+                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
                     });
                 }).catch(err => {
                     console.log(chalk.red('[MSSQL]    ' + err.message));
-                    response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
+                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
                 });
             }).catch(err => {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
-                response.status(500).json(new ApiError(500, 'Connection to the database has been lost. Please try again later')).end();
+                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
 
         } catch(error) {
