@@ -9,13 +9,13 @@ const ApiError = require('../errors/ApiError');
 
 module.exports = {
     validateToken(request, response, next) {
-        console.log(chalk.yellow('[TOKEN]    Validation of token requested'));
+        console.log(chalk.yellow('[TOKEN]    Validatie van token verzocht'));
         const token = request.header('x-access-token') || '';
         auth.decodeToken(token, (error, payload) => {
             if(error) {
                 next(new ApiError(401, error.message));
             } else {
-                console.log(chalk.green('[TOKEN]    Authenticated user: ' + payload.sub));
+                console.log(chalk.green('[TOKEN]    Authentificatie gelukt van email: ' + payload.sub));
                 next();
             }
         });
@@ -23,55 +23,54 @@ module.exports = {
 
     login(request, response, next) {
         try {
-            const username = request.body.username || '';
+            const email = request.body.email || '';
             const password = request.body.password || '';
 
-            assert(username !== '', 'Username was not defined or passed as empty');
-            assert(password !== '', 'Password was not defined or passed as empty');
-            assert(typeof(username) === 'string', 'Username is not of type string');
-            assert(typeof(password) === 'string', 'Password is not of type string');
+            assert(email !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(password !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(typeof(email) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(typeof(password) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
 
-                const statement = new sql.PreparedStatement(connection);
-                statement.input('username', sql.NVarChar(30));
+                const statement = new sql.PreparedStatement(conn);
+                statement.input('email', sql.NVarChar(32));
                 statement.input('password', sql.NVarChar(100));
 
-                statement.prepare('SELECT * FROM account WHERE username = @username AND password = @password;').then(s => {
+                statement.prepare('SELECT * FROM account WHERE email = @email AND password = @password;').then(s => {
                    s.execute({
-                       username: username,
+                       email: email,
                        password: auth.hashPassword(password)
                    }).then(result => {
                        s.unprepare();
 
                        if(result.recordset.length > 0) {
-                           console.log(chalk.green('[MSSQL]    Succesful login with username: ' + username));
-                           const token = auth.encodeToken(username);
+                           console.log(chalk.green('[MSSQL]    Succesvolle login met email: ' + email));
+                           const token = auth.encodeToken(email);
 
                            response.status(200).json({
-                               status: 200,
-                               message: 'Successfully logged in',
-                               token: token
+                               token: token,
+                               email: email
                            }).end();
                        } else {
-                           console.log(chalk.red('[MSSQL]    Invalid Username/Password provided with username: ' + username));
-                           response.status(500).json(new ApiError(500, 'Invalid Username/Password')).end();
+                           console.log(chalk.red('[MSSQL]    Niet geautoriseerd (geen valid token) met email: ' + email));
+                           response.status(401).json(new ApiError(401, 'Niet geautoriseerd (geen valid token)')).end();
                        }
                        }).catch( err => {
                        console.log(chalk.red('[MSSQL]    ' + err.message));
-                       response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
+                       response.status(500).json(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw')).end();
                    });
                 }).catch(err => {
                     console.log(chalk.red('[MSSQL]    ' + err.message));
-                    response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
+                    response.status(500).json(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw')).end();
                 });
             }).catch(err => {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
-                response.status(500).json(new ApiError(500, 'Connection to the database has been lost. Please try again later')).end();
+                response.status(500).json(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw')).end();
             });
         } catch(error) {
-            next(new ApiError(500, error.message));
+            next(new ApiError(412, error.message));
         }
     },
 
@@ -122,23 +121,23 @@ module.exports = {
                                         message: 'Successfully created an account'
                                     }).end();
                                 }).catch(err => {
-                                    console.log(chalk.red('[MSSQL2]    ' + err.message));
+                                    console.log(chalk.red('[MSSQL]    ' + err.message));
                                     response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
                                 });
                             }).catch(err => {
-                                console.log(chalk.red('[MSSQL3]    ' + err.message));
+                                console.log(chalk.red('[MSSQL]    ' + err.message));
                                 response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
                             });
                         } else {
-                            console.log(chalk.red('[MSSQL4]    ' + 'An account with that username already exists'));
+                            console.log(chalk.red('[MSSQL]    ' + 'An account with that username already exists'));
                             response.status(500).json(new ApiError(500, 'An account with that username already exists')).end();
                         }
                     }).catch(err => {
-                        console.log(chalk.red('[MSSQL5]    ' + err.message));
+                        console.log(chalk.red('[MSSQL]    ' + err.message));
                         response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
                     });
                 }).catch(err => {
-                    console.log(chalk.red('[MSSQL6]    ' + err.message));
+                    console.log(chalk.red('[MSSQL]    ' + err.message));
                     response.status(500).json(new ApiError(500, 'An internal error occured. Please try again later')).end();
                 });
             }).catch(err => {
