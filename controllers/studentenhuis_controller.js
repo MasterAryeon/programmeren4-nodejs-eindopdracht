@@ -7,9 +7,6 @@ const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
-//PLACEHOLDER for the studentenhuisList
-let studentenhuisList;
-
 module.exports = {
 
     getStudentenhuisList(req, res, next){
@@ -129,7 +126,65 @@ module.exports = {
     putStudentenhuisById (req, res, next) {
         console.log('----------------------A PUT request was made---------------------');
         console.log('---------------updating item in the studentenhuisList---------------');
-        res.status(200).json({}).end();//Response to the DELETE request
+        try {
+            const huisId = req.params.id || -1;
+            const naam = req.body.naam || '';
+            const adres = req.body.adres || '';
+
+            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(adres !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+
+            const connection = new sql.ConnectionPool(config.sql);
+            connection.connect().then(conn => {
+
+                const statement = new sql.PreparedStatement(conn);
+                statement.input('huisID',sql.Int);
+                statement.input('naam', sql.NVarChar(32));
+                statement.input('adres', sql.NVarChar(32));
+                statement.input('accountID', sql.Int);
+                statement.prepare('EXEC updateStudentenhuis @huisID, @naam, @adres, @accountID;').then(s => {
+                    s.execute({
+                        huisID: huisId,
+                        naam: naam,
+                        adres: adres,
+                        accountID: req.header.tokenid
+                    }).then(result => {
+                        s.unprepare();
+
+                        const row = result.recordset[0];
+                        const update = row.result;
+                        switch(update) {
+                            case 1:
+                                res.status(200).json({
+                                    ID: row.ID,
+                                    naam: row.naam,
+                                    adres: row.adres,
+                                    contact: row.contact,
+                                    email: row.email
+                                }).end();
+                                break;
+                            case 0:
+                                next(new ApiError(409,'Conflict (Gebruiker mag deze data niet aanpassen)'));
+                                break;
+                            case -1:
+                                next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
+                        }
+                    }).catch( err => {
+                        console.log(chalk.red('[MSSQL]    ' + err.message));
+                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                    });
+                }).catch(err => {
+                    console.log(chalk.red('[MSSQL]    ' + err.message));
+                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                });
+            }).catch(err => {
+                console.log(chalk.red('[MSSQL]    ' + err.message));
+                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
+            });
+        } catch(error) {
+            next(new ApiError(412, error.message));
+        }
     },
 
     deleteStudentenhuisById(req, res, next){

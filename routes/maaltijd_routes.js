@@ -10,20 +10,19 @@ const maaltijd_controller = require('../controllers/maaltijd_controller');
 let routes = express.Router();
 
 //The GET maaltijd request
-routes.get('/studentenhuis:huisId/maaltijd', maaltijd_controller.getMaaltijdList);
+routes.get('/', maaltijd_controller.getMaaltijdList);
 
 //The POST studentenhuis request
-routes.post('/studentenhuis:huisId/maaltijd', maaltijd_controller.createStudentenhuis);
+routes.post('/', maaltijd_controller.createMaaltijd);
 
 //The GET maaltijd by Id request
-routes.get('/studentenhuis:huisId/maaltijd:maaltijdId', maaltijd_controller.getMaaltijdById());
+routes.get('/:maaltijdId', maaltijd_controller.getMaaltijdById);
 
 //The PUT maaltijd by Id request
-routes.put('/studentenhuis:huisId/maaltijd:maaltijdId', maaltijd_controller.putMaaltijdById);
+routes.put('/:maaltijdId', maaltijd_controller.putMaaltijdById);
 
 //The DELETE maaltijd by Id request
-routes.delete('/studentenhuis:huisId/maaltijd:maaltijdId', maaltijd_controller.deleteMaaltijdById);
-
+routes.delete('/:maaltijdId', maaltijd_controller.deleteMaaltijdById);
 
 module.exports = routes;
 
