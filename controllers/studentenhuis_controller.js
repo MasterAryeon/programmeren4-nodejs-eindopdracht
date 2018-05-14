@@ -46,7 +46,40 @@ module.exports = {
     getStudentenhuisById(req, res, next) {
         console.log('------------------A GET request was made-------------------');
         console.log('------------------Get studentenhuis by ID------------------');
-        res.status(200).json(studentenhuisList).end();//Response to the DELETE request
+        try {
+            const id = req.params.id;
+
+            const connection = new sql.ConnectionPool(config.sql);
+            connection.connect().then(conn => {
+
+                const statement = new sql.PreparedStatement(conn);
+                statement.input('ID',sql.Int);
+                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => {
+                    s.execute({
+                        ID: id
+                    }).then(result => {
+                        s.unprepare();
+
+                        if(result.recordset.length !== 0) {
+                            res.status(200).json(result.recordset).end();
+                        } else {
+                            next(new ApiError(404,'Niet gevonden (huisId bestaat niet)'));
+                        }
+                    }).catch( err => {
+                        console.log(chalk.red('[MSSQL]    ' + err.message));
+                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                    });
+                }).catch(err => {
+                    console.log(chalk.red('[MSSQL]    ' + err.message));
+                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                });
+            }).catch(err => {
+                console.log(chalk.red('[MSSQL]    ' + err.message));
+                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
+            });
+        } catch(error) {
+            next(new ApiError(412, error.message));
+        }
     },
     createStudentenhuis (req, res, next) {
         console.log('----------------------A POST request was made---------------------');
