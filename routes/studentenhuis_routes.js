@@ -10,20 +10,19 @@ const studentenhuis_controller = require('../controllers/studentenhuis_controlle
 let routes = express.Router();
 
 //The GET studentenhuis request
-routes.get('/studentenhuis', studentenhuis_controller.getStudentenhuisList);
+routes.get('/', studentenhuis_controller.getStudentenhuisList);
 
 //The POST studentenhuis request
-routes.post('/studentenhuis', studentenhuis_controller.createStudentenhuis);
+routes.post('/', studentenhuis_controller.createStudentenhuis);
 
 //The GET studentenhuis by Id request
-routes.get('/studentenhuis/:id', studentenhuis_controller.getStudentenhuisById);
+routes.get('/:id', studentenhuis_controller.getStudentenhuisById);
 
 //The PUT studentenhuis by Id request
-routes.put('/studentenhuis/:id', studentenhuis_controller.putStudentenhuisById);
+routes.put('/:id', studentenhuis_controller.putStudentenhuisById);
 
 //The DELETE studentenhuis by Id request
-routes.delete('/studentenhuis/:id', studentenhuis_controller.deleteStudentenhuisById);
-
+routes.delete('/:id', studentenhuis_controller.deleteStudentenhuisById);
 
 module.exports = routes;
 
