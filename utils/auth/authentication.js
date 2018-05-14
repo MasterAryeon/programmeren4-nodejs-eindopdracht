@@ -43,19 +43,5 @@ function hashPassword(password) {
     return sha('sha256').update(password).digest('hex');
 }
 
-function isOwner(token, accountId, callback) {
-    decodeToken(token, (err, payload) => {
-        if(err) {
-            callback(false);
-        } else {
-            console.log(payload.sub + ' ' + accountId);
-            if(payload.sub === accountId) {
-                callback(true);
-            } else {
-                callback(false);
-            }
-        }
-    });
-}
 
-module.exports = { encodeToken, decodeToken, hashPassword, isOwner };
+module.exports = { encodeToken, decodeToken, hashPassword };

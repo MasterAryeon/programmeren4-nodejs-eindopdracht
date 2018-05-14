@@ -19,10 +19,10 @@ routes.post('/studentenhuis', studentenhuis_controller.createStudentenhuis);
 routes.get('/studentenhuis/:id', studentenhuis_controller.getStudentenhuisById);
 
 //The PUT studentenhuis by Id request
-routes.put('studentenhuis:huisId', studentenhuis_controller.putStudentenhuisById);
+routes.put('/studentenhuis/:id', studentenhuis_controller.putStudentenhuisById);
 
 //The DELETE studentenhuis by Id request
-routes.delete('studentenhuis:huisId', studentenhuis_controller.deleteStudentenhuisById);
+routes.delete('/studentenhuis/:id', studentenhuis_controller.deleteStudentenhuisById);
 
 
 module.exports = routes;
