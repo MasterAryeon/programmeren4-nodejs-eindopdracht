@@ -7,11 +7,12 @@ const sha = require('sha.js');
 //
 // Encode (from username to token)
 //
-function encodeToken(username) {
+function encodeToken(accountId, email) {
     const payload = {
         exp: moment().add(10, 'days').unix(),
         iat: moment().unix(),
-        sub: username
+        sub: accountId,
+        email: email
     };
 
     return jwt.encode(payload, config.key);
@@ -42,12 +43,13 @@ function hashPassword(password) {
     return sha('sha256').update(password).digest('hex');
 }
 
-function isOwner(token, email, callback) {
+function isOwner(token, accountId, callback) {
     decodeToken(token, (err, payload) => {
         if(err) {
             callback(false);
         } else {
-            if(payload.sub === email) {
+            console.log(payload.sub + ' ' + accountId);
+            if(payload.sub === accountId) {
                 callback(true);
             } else {
                 callback(false);
