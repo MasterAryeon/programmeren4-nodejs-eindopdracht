@@ -86,10 +86,44 @@ module.exports = {
     createStudentenhuis (req, res, next) {
         console.log('----------------------A POST request was made---------------------');
         console.log('---------------Adding item to the studentenhuisList---------------');
-        console.log(req.body); //Printing the POST request's body
 
-        //response to the POST request
-        res.status(200).json({}).end();//Response to the POST request
+        try {
+            const naam = req.body.naam || '';
+            const adres = req.body.adres || '';
+
+            assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(adres !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            const connection = new sql.ConnectionPool(config.sql);
+            connection.connect().then(conn => {
+
+                const statement = new sql.PreparedStatement(conn);
+                statement.input('naam', sql.NVarChar(32));
+                statement.input('adres', sql.NVarChar(32));
+                statement.input('accountID', sql.Int);
+                statement.prepare('EXEC addStudentenhuis @naam, @adres, @accountID;').then(s => {
+                    s.execute({
+                        naam: naam,
+                        adres: adres,
+                        accountID: req.header.tokenid
+                    }).then(result => {
+                        s.unprepare();
+
+                        res.status(200).json(result.recordset).end();
+                    }).catch( err => {
+                        console.log(chalk.red('[MSSQL]    ' + err.message));
+                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                    });
+                }).catch(err => {
+                    console.log(chalk.red('[MSSQL]    ' + err.message));
+                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                });
+            }).catch(err => {
+                console.log(chalk.red('[MSSQL]    ' + err.message));
+                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
+            });
+        } catch(error) {
+            next(new ApiError(412, error.message));
+        }
     },
 
     putStudentenhuisById (req, res, next) {
