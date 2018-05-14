@@ -16,6 +16,7 @@ module.exports = {
             if(error) {
                 next(new ApiError(401, error.message));
             } else {
+                request.header.tokenid = payload.sub;
                 console.log(chalk.green('[TOKEN]    Authentificatie gelukt van email: ' + payload.email));
                 next();
             }
