@@ -16,7 +16,7 @@ routes.get('/studentenhuis', studentenhuis_controller.getStudentenhuisList);
 routes.post('/studentenhuis', studentenhuis_controller.createStudentenhuis);
 
 //The GET studentenhuis by Id request
-routes.get('/studentenhuis:huisId', studentenhuis_controller.getStudentenhuisById);
+routes.get('/studentenhuis/:id', studentenhuis_controller.getStudentenhuisById);
 
 //The PUT studentenhuis by Id request
 routes.put('studentenhuis:huisId', studentenhuis_controller.putStudentenhuisById);
