@@ -11,11 +11,12 @@ module.exports = {
     validateToken(request, response, next) {
         console.log(chalk.yellow('[TOKEN]    Validatie van token verzocht'));
         const token = request.header('x-access-token') || '';
+
         auth.decodeToken(token, (error, payload) => {
             if(error) {
                 next(new ApiError(401, error.message));
             } else {
-                console.log(chalk.green('[TOKEN]    Authentificatie gelukt van email: ' + payload.sub));
+                console.log(chalk.green('[TOKEN]    Authentificatie gelukt van email: ' + payload.email));
                 next();
             }
         });
@@ -46,7 +47,8 @@ module.exports = {
                        s.unprepare();
 
                        if(result.recordset[0].result === 1) {
-                           const token = auth.encodeToken(email);
+                           const accountId = result.recordset[0].id;
+                           const token = auth.encodeToken(accountId, email);
                            console.log(chalk.green('[MSSQL]    Account succesvol ingelogd met email: ' + email));
                            response.status(200).json({
                                token: token,
