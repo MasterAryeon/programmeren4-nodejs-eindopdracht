@@ -4,7 +4,7 @@ const sql = require('mssql');
 
 const auth = require('../utils/auth/authentication');
 const config = require('../config/config');
-const ApiError = require('../errors/ApiError');
+const ApiError = require('../domain/ApiError');
 
 
 module.exports = {
@@ -47,6 +47,7 @@ module.exports = {
 
                        if(result.recordset[0].result === 1) {
                            const token = auth.encodeToken(email);
+                           console.log(chalk.green('[MSSQL]    Account succesvol ingelogd met email: ' + email));
                            response.status(200).json({
                                token: token,
                                email: email
@@ -108,6 +109,7 @@ module.exports = {
 
                         if(result.recordset[0].result === 1) {
                             const token = auth.encodeToken(email);
+                            console.log(chalk.green('[MSSQL]    Account succesvol geregistreerd met email: ' + email));
                             response.status(200).json({
                                 token: token,
                                 email: email

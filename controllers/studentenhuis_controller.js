@@ -4,7 +4,7 @@
 
 const sql = require('mssql');
 const config = require('../config/config');
-const ApiError = require('../errors/ApiError');
+const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
 //PLACEHOLDER for the studentenhuisList
