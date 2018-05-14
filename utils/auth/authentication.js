@@ -42,4 +42,18 @@ function hashPassword(password) {
     return sha('sha256').update(password).digest('hex');
 }
 
-module.exports = { encodeToken, decodeToken, hashPassword };
+function isOwner(token, email, callback) {
+    decodeToken(token, (err, payload) => {
+        if(err) {
+            callback(false);
+        } else {
+            if(payload.sub === email) {
+                callback(true);
+            } else {
+                callback(false);
+            }
+        }
+    });
+}
+
+module.exports = { encodeToken, decodeToken, hashPassword, isOwner };
