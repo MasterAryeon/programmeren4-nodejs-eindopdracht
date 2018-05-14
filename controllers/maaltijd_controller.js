@@ -170,7 +170,83 @@ module.exports = {
     putMaaltijdById (req, res, next) {
         console.log('----------------------A PUT request was made---------------------');
         console.log('----------------updating item in the maaltijdList----------------');
-        res.status(200).json({}).end(); //Response to the GET request
+        try {
+
+            const huisId = req.params.id || -1;
+            const maaltijdId = req.params.maaltijdId || -1;
+            const naam = req.body.naam || '';
+            const beschrijving = req.body.beschrijving || '';
+            const ingredienten = req.body.ingredienten || '';
+            const allergie = req.body.allergie || '';
+            const prijs = req.body.prijs || -1;
+
+            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(maaltijdId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(beschrijving !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(ingredienten !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(allergie !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(prijs > 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+
+            const connection = new sql.ConnectionPool(config.sql);
+            connection.connect().then(conn => {
+
+                const statement = new sql.PreparedStatement(conn);
+                statement.input('accountID',sql.Int);
+                statement.input('huisID',sql.Int);
+                statement.input('maaltijdID',sql.Int);
+                statement.input('naam', sql.NVarChar(32));
+                statement.input('beschrijving', sql.NVarChar(32));
+                statement.input('ingredienten', sql.NVarChar(32));
+                statement.input('allergie', sql.NVarChar(32));
+                statement.input('prijs', sql.Int);
+                statement.prepare('EXEC updateMaaltijd @accountID, @huisID, @maaltijdID, @naam, @beschrijving, @ingredienten, @allergie, @prijs;').then(s => {
+                    s.execute({
+                        accountID: req.header.tokenid,
+                        huisID: huisId,
+                        maaltijdID: maaltijdId,
+                        naam: naam,
+                        beschrijving: beschrijving,
+                        ingredienten: ingredienten,
+                        allergie: allergie,
+                        prijs: prijs
+                    }).then(result => {
+                        s.unprepare();
+
+                        const row = result.recordset[0];
+                        const update = row.result;
+                        switch(update) {
+                            case 1:
+                                res.status(200).json({
+                                    ID: row.ID,
+                                    naam: row.naam,
+                                    beschrijving: row.beschrijving,
+                                    ingredienten: row.ingredienten,
+                                    allergie: row.allergie,
+                                    prijs: row.prijs
+                                }).end();
+                                break;
+                            case 0:
+                                next(new ApiError(409,'Conflict (Gebruiker mag deze data niet aanpassen)'));
+                                break;
+                            case -1:
+                                next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
+                        }
+                    }).catch( err => {
+                        console.log(chalk.red('[MSSQL]    ' + err.message));
+                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                    });
+                }).catch(err => {
+                    console.log(chalk.red('[MSSQL]    ' + err.message));
+                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
+                });
+            }).catch(err => {
+                console.log(chalk.red('[MSSQL]    ' + err.message));
+                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
+            });
+        } catch(error) {
+            next(new ApiError(412, error.message));
+        }
     },
 
     deleteMaaltijdById(req, res, next){
