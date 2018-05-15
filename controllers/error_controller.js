@@ -1,4 +1,4 @@
-const ApiError = require('../errors/ApiError');
+const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
 module.exports = {
