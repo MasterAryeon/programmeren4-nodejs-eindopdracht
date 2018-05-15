@@ -20,6 +20,7 @@ const auth_routes = require('./routes/auth_routes');
 const error_routes = require('./routes/error_routes');
 const studentenhuis_routes = require('./routes/studentenhuis_routes');
 const maaltijd_routes = require('./routes/maaltijd_routes');
+const deelnemer_routes = require('./routes/deelnemer_routes');
 const PLACEHOLDER_routes = require('./routes/PLACEHOLDER_routes');
 
 // Include necessary controllers
@@ -49,6 +50,7 @@ app.all('*', AuthController.validateToken);
 // Parse all the defined endpoints that are being provided by this server
 app.use('/api/studentenhuis', studentenhuis_routes);
 app.use('/api/studentenhuis', maaltijd_routes);
+app.use('/api/studentenhuis', deelnemer_routes);
 
 //Error handling - Endpoint handling routing and final error destination handling
 app.use('*', error_routes);
