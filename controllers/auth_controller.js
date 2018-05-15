@@ -6,6 +6,9 @@ const auth = require('../utils/auth/authentication');
 const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
 
+const UserLogin = require('../domain/user_login_JSON');
+const ValidToken = require('../domain/valid_token');
+const UserRegister = require('../domain/user_register_JSON');
 
 module.exports = {
     validateToken(request, response, next) {
@@ -28,10 +31,7 @@ module.exports = {
             const email = request.body.email || '';
             const password = request.body.password || '';
 
-            assert(email !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(password !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(typeof(email) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(typeof(password) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            const userlogin = new UserLogin(email, password);
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
@@ -42,21 +42,19 @@ module.exports = {
 
                 statement.prepare('EXEC loginAccount @email, @password;').then(s => {
                    s.execute({
-                       email: email,
-                       password: auth.hashPassword(password)
+                       email: userlogin.email,
+                       password: auth.hashPassword(userlogin.password)
                    }).then(result => {
                        s.unprepare();
 
                        if(result.recordset[0].result === 1) {
                            const accountId = result.recordset[0].id;
-                           const token = auth.encodeToken(accountId, email);
-                           console.log(chalk.green('[MSSQL]    Account succesvol ingelogd met email: ' + email));
-                           response.status(200).json({
-                               token: token,
-                               email: email
-                           }).end();
+                           const validtoken = new ValidToken(auth.encodeToken(accountId, userlogin.email), userlogin.email);
+
+                           console.log(chalk.green('[MSSQL]    Account succesvol ingelogd met email: ' + userlogin.email));
+                           response.status(200).json(validtoken).end();
                        } else {
-                           console.log(chalk.red('[MSSQL]    Niet geautoriseerd (geen valid token) met email: ' + email));
+                           console.log(chalk.red('[MSSQL]    Niet geautoriseerd (geen valid token) met email: ' + userlogin.email));
                            next(new ApiError(401, 'Niet geautoriseerd (geen valid token)'));
                        }
                    }).catch( err => {
@@ -83,15 +81,7 @@ module.exports = {
             const firstname = request.body.firstname || '';
             const lastname = request.body.lastname || '';
 
-            assert(email !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(password !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(firstname !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(lastname !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-
-            assert(typeof(email) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(typeof(password) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(typeof(firstname) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(typeof(lastname) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            const userRegistration = new UserRegister(firstname, lastname, email, password);
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
@@ -103,21 +93,18 @@ module.exports = {
                 statement.input('lastname', sql.NVarChar(32));
                 statement.prepare('EXEC registerAccount @email, @password, @firstname, @lastname;').then(s => {
                     s.execute({
-                        email: email,
-                        password: auth.hashPassword(password),
-                        firstname: firstname,
-                        lastname: lastname
+                        email: userRegistration.email,
+                        password: auth.hashPassword(userRegistration.password),
+                        firstname: userRegistration.firstname,
+                        lastname: userRegistration.lastname
                     }).then(result => {
                         s.unprepare();
 
                         if(result.recordset[0].result === 1) {
                             const accountId = result.recordset[0].id;
-                            const token = auth.encodeToken(accountId, email);
-                            console.log(chalk.green('[MSSQL]    Account succesvol geregistreerd met email: ' + email));
-                            response.status(200).json({
-                                token: token,
-                                email: email
-                            }).end();
+                            const validtoken = new ValidToken(auth.encodeToken(accountId, userRegistration.email), userRegistration.email);
+                            console.log(chalk.green('[MSSQL]    Account succesvol geregistreerd met email: ' + userRegistration.email));
+                            response.status(200).json(validtoken).end();
                         } else {
                             console.log(chalk.red('[MSSQL]    ' + 'Een gebruiker met dit email adres bestaat al.'));
                             next(new ApiError(406, 'Een gebruiker met dit email adres bestaat al.'));
@@ -136,7 +123,7 @@ module.exports = {
             });
 
         } catch(error) {
-            next(new ApiError(500, error.message));
+            next(new ApiError(412, error.message));
         }
     },
 

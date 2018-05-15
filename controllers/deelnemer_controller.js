@@ -8,6 +8,8 @@ const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
+const DeelnemerResponse = require('../domain/deelnemer_response');
+
 module.exports = {
 
     getDeelnemerList(request, response, next){
@@ -17,8 +19,8 @@ module.exports = {
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
-            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(maaltijdId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+            assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
@@ -72,8 +74,8 @@ module.exports = {
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
-            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(maaltijdId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+            assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
@@ -103,7 +105,8 @@ module.exports = {
                                     break;
                             }
                         } else {
-                            response.status(200).json(result.recordset).end();
+                            const row = result.recordset[0];
+                            response.status(200).json(new DeelnemerResponse(row.firstname, row.lastname, row.email)).end();
                         }
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
@@ -131,8 +134,8 @@ module.exports = {
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
-            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(maaltijdId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+            assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {

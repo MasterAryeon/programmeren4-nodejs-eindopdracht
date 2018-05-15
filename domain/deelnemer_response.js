@@ -2,14 +2,24 @@
     deelnemer_response.js   -  deelnemer_response class
  */
 
+const assert = require('assert');
+
 class deelnemer_response {
 
     //Constructor for deelnemer_response
     constructor(firstname, lastname, email){
-        this._firstname = firstname;
-        this._lastname = lastname;
-        this._email = email;
 
+        assert(firstname !== '', 'Een of meer properties ontbreken of zijn foutief');
+        assert(lastname !== '', 'Een of meer properties ontbreken of zijn foutief');
+        assert(email !== '', 'Een of meer properties ontbreken of zijn foutief');
+
+        assert(typeof(firstname) === 'string', 'Een of meer properties ontbreken of zijn foutief');
+        assert(typeof(lastname) === 'string', 'Een of meer properties ontbreken of zijn foutief');
+        assert(typeof(email) === 'string', 'Een of meer properties ontbreken of zijn foutief');
+
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
     }
 }
 

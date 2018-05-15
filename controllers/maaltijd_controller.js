@@ -8,6 +8,8 @@ const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
+const Maaltijd = require('../domain/maaltijd');
+const MaaltijdResponse = require('../domain/maaltijd_response');
 
 module.exports = {
 
@@ -77,8 +79,9 @@ module.exports = {
 
                         const records = result.recordset;
                         if(records.length !== 0) {
-                            if(records[0].result !== -1) {
-                                res.status(200).json(result.recordset[0]).end();
+                            const row = records[0];
+                            if(row.result !== -1) {
+                                res.status(200).json(new MaaltijdResponse(row.ID, row.naam, row.beschrijving, row.ingredienten, row.allergie, row.prijs)).end();
                             } else {
                                 console.log(chalk.red('[MSSQL]    ' + 'Niet gevonden (huisId bestaat niet)'));
                                 next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
@@ -114,12 +117,11 @@ module.exports = {
             const allergie = req.body.allergie || '';
             const prijs = req.body.prijs || -1;
 
+            const maaltijd = new Maaltijd(naam, beschrijving, ingredienten, allergie, prijs);
+
             assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(beschrijving !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(ingredienten !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(allergie !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(prijs > 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
+
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
 
@@ -135,17 +137,18 @@ module.exports = {
                     s.execute({
                         accountID: req.header.tokenid,
                         huisID: huisId,
-                        naam: naam,
-                        beschrijving: beschrijving,
-                        ingredienten: ingredienten,
-                        allergie: allergie,
-                        prijs: prijs
+                        naam: maaltijd.naam,
+                        beschrijving: maaltijd.beschrijving,
+                        ingredienten: maaltijd.ingredienten,
+                        allergie: maaltijd.allergie,
+                        prijs: maaltijd.prijs
                     }).then(result => {
                         s.unprepare();
 
                         const records = result.recordset;
                         if(records[0].result !== -1) {
-                            res.status(200).json(result.recordset[0]).end();
+                            const row = records[0];
+                            res.status(200).json(new MaaltijdResponse(row.ID, row.naam, row.beschrijving, row.ingredienten, row.allergie, row.prijs)).end();
                         } else {
                             console.log(chalk.red('[MSSQL]    ' + 'Niet gevonden (huisId bestaat niet)'));
                             next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
@@ -180,13 +183,12 @@ module.exports = {
             const allergie = req.body.allergie || '';
             const prijs = req.body.prijs || -1;
 
-            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(maaltijdId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(beschrijving !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(ingredienten !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(allergie !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(prijs > 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
+
+            assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+            assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+
+            const maaltijd = new Maaltijd(naam, beschrijving, ingredienten, allergie, prijs);
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
@@ -205,11 +207,11 @@ module.exports = {
                         accountID: req.header.tokenid,
                         huisID: huisId,
                         maaltijdID: maaltijdId,
-                        naam: naam,
-                        beschrijving: beschrijving,
-                        ingredienten: ingredienten,
-                        allergie: allergie,
-                        prijs: prijs
+                        naam: maaltijd.naam,
+                        beschrijving: maaltijd.beschrijving,
+                        ingredienten: maaltijd.ingredienten,
+                        allergie: maaltijd.allergie,
+                        prijs: maaltijd.prijs
                     }).then(result => {
                         s.unprepare();
 
@@ -217,14 +219,7 @@ module.exports = {
                         const update = row.result;
                         switch(update) {
                             case 1:
-                                res.status(200).json({
-                                    ID: row.ID,
-                                    naam: row.naam,
-                                    beschrijving: row.beschrijving,
-                                    ingredienten: row.ingredienten,
-                                    allergie: row.allergie,
-                                    prijs: row.prijs
-                                }).end();
+                                res.status(200).json(new MaaltijdResponse(row.ID, row.naam, row.beschrijving, row.ingredienten, row.allergie, row.prijs)).end();
                                 break;
                             case 0:
                                 next(new ApiError(409,'Conflict (Gebruiker mag deze data niet aanpassen)'));
@@ -260,8 +255,9 @@ module.exports = {
             const huisId = req.params.id || -1;
             const maaltijdId = req.params.maaltijdId || -1;
 
-            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(maaltijdId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
+            assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+            assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {

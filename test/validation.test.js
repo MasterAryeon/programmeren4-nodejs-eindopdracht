@@ -49,12 +49,12 @@ describe('Error handling for login assertions',() => {
             .send({
                 password: 'admin'
             }).end((error, response) => {
-                response.should.have.status(500);
+                response.should.have.status(412);
                 response.should.be.a('object');
 
                 const body = response.body;
-                body.should.have.property('status').equals(500);
-                body.should.have.property('message').equals('Username was not defined or passed as empty');
+                body.should.have.property('status').equals(412);
+                body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
                 done();
         })
     });
@@ -66,12 +66,12 @@ describe('Error handling for login assertions',() => {
                 username: '',
                 password: 'admin'
             }).end((error, response) => {
-                response.should.have.status(500);
+                response.should.have.status(412);
                 response.should.be.a('object');
 
                 const body = response.body;
-                body.should.have.property('status').equals(500);
-                body.should.have.property('message').equals('Username was not defined or passed as empty');
+                body.should.have.property('status').equals(412);
+                body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
                 done();
         })
     });
@@ -82,12 +82,12 @@ describe('Error handling for login assertions',() => {
             .send({
                 username: 'admin'
             }).end((error, response) => {
-                response.should.have.status(500);
+                response.should.have.status(412);
                 response.should.be.a('object');
 
                 const body = response.body;
-                body.should.have.property('status').equals(500);
-                body.should.have.property('message').equals('Password was not defined or passed as empty');
+                body.should.have.property('status').equals(412);
+                body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
                 done();
         })
     });
@@ -99,19 +99,19 @@ describe('Error handling for login assertions',() => {
                 username: 'admin',
                 password: ''
             }).end((error, response) => {
-                response.should.have.status(500);
+                response.should.have.status(412);
                 response.should.be.a('object');
 
                 const body = response.body;
-                body.should.have.property('status').equals(500);
-                body.should.have.property('message').equals('Password was not defined or passed as empty');
+                body.should.have.property('status').equals(412);
+                body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
                 done();
         })
     })
 });
 
 describe('Error handling of registration assertions',() => {
-    it('Should throw an assert error when not passing an username when registrating an account',(done) => {
+    it('Should throw an assert error when not passing an email when registrating an account',(done) => {
         chai.request(server)
             .post('/api/register')
             .send({
@@ -119,31 +119,31 @@ describe('Error handling of registration assertions',() => {
                 firstname: 'user',
                 lastname: 'user'
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Username was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         })
     });
 
-    it('Should throw an assert error when passing an empty username when registrating an account',(done) => {
+    it('Should throw an assert error when passing an empty email when registrating an account',(done) => {
         chai.request(server)
             .post('/api/register')
             .send({
-                username: '',
+                email: '',
                 password: 'user',
                 firstname: 'user',
                 lastname: 'user'
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Username was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         });
     });
@@ -152,16 +152,16 @@ describe('Error handling of registration assertions',() => {
         chai.request(server)
             .post('/api/register')
             .send({
-                username: 'user',
+                email: 'user',
                 firstname: 'user',
                 lastname: 'user'
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Password was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         })
     });
@@ -170,17 +170,17 @@ describe('Error handling of registration assertions',() => {
         chai.request(server)
             .post('/api/register')
             .send({
-                username: 'user',
+                email: 'user',
                 password: '',
                 firstname: 'user',
                 lastname: 'user'
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Password was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         })
     });
@@ -189,16 +189,16 @@ describe('Error handling of registration assertions',() => {
         chai.request(server)
             .post('/api/register')
             .send({
-                username: 'user',
+                email: 'user',
                 password: 'user',
                 lastname: 'user'
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Firstname was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         })
     });
@@ -207,17 +207,17 @@ describe('Error handling of registration assertions',() => {
         chai.request(server)
             .post('/api/register')
             .send({
-                username: 'user',
+                email: 'user',
                 password: 'user',
                 firstname: '',
                 lastname: 'user'
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Firstname was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         })
     });
@@ -226,16 +226,16 @@ describe('Error handling of registration assertions',() => {
         chai.request(server)
             .post('/api/register')
             .send({
-                username: 'user',
+                email: 'user',
                 password: 'user',
                 firstname: 'user'
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Lastname was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         })
     });
@@ -244,17 +244,17 @@ describe('Error handling of registration assertions',() => {
         chai.request(server)
             .post('/api/register')
             .send({
-                username: 'user',
+                email: 'user',
                 password: 'user',
                 firstname: 'user',
                 lastname: ''
             }).end((error, response) => {
-            response.should.have.status(500);
+            response.should.have.status(412);
             response.should.be.a('object');
 
             const body = response.body;
-            body.should.have.property('status').equals(500);
-            body.should.have.property('message').equals('Lastname was not defined or passed as empty');
+            body.should.have.property('status').equals(412);
+            body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
             done();
         })
     });
