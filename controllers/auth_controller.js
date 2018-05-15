@@ -123,7 +123,7 @@ module.exports = {
             });
 
         } catch(error) {
-            next(new ApiError(500, error.message));
+            next(new ApiError(412, error.message));
         }
     },
 
