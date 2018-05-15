@@ -130,7 +130,7 @@ module.exports = {
         console.log('---------------A DELETE request was made---------------');
         console.log('-------------------DELETE deelnemer--------------------');
         try {
-            console.log(request.params);
+
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 

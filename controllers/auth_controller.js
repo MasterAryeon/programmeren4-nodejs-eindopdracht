@@ -52,7 +52,9 @@ module.exports = {
                            const validtoken = new ValidToken(auth.encodeToken(accountId, userlogin.email), userlogin.email);
 
                            console.log(chalk.green('[MSSQL]    Account succesvol ingelogd met email: ' + userlogin.email));
+
                            response.status(200).json(validtoken).end();
+
                        } else {
                            console.log(chalk.red('[MSSQL]    Niet geautoriseerd (geen valid token) met email: ' + userlogin.email));
                            next(new ApiError(401, 'Niet geautoriseerd (geen valid token)'));
@@ -99,16 +101,17 @@ module.exports = {
                         lastname: userRegistration.lastname
                     }).then(result => {
                         s.unprepare();
-
                         if(result.recordset[0].result === 1) {
                             const accountId = result.recordset[0].id;
                             const validtoken = new ValidToken(auth.encodeToken(accountId, userRegistration.email), userRegistration.email);
                             console.log(chalk.green('[MSSQL]    Account succesvol geregistreerd met email: ' + userRegistration.email));
+
                             response.status(200).json(validtoken).end();
                         } else {
                             console.log(chalk.red('[MSSQL]    ' + 'Een gebruiker met dit email adres bestaat al.'));
                             next(new ApiError(406, 'Een gebruiker met dit email adres bestaat al.'));
                         }
+
                     }).catch(err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
                         next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
@@ -121,7 +124,6 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }

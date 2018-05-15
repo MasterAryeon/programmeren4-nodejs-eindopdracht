@@ -26,6 +26,7 @@ module.exports = {
                         s.unprepare();
 
                         res.status(200).json(result.recordset).end();
+
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
                         next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
@@ -63,10 +64,11 @@ module.exports = {
                         s.unprepare();
 
                         if(result.recordset.length !== 0) {
-                            res.status(200).json(result.recordset).end();
+                            res.status(200).json(result.recordset[0]).end();
                         } else {
                             next(new ApiError(404,'Niet gevonden (huisId bestaat niet)'));
                         }
+
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
                         next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
@@ -111,6 +113,7 @@ module.exports = {
 
                         const row = result.recordset[0];
                         res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
+
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
                         next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
@@ -170,6 +173,7 @@ module.exports = {
                             case -1:
                                 next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
                         }
+
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
                         next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
@@ -220,6 +224,7 @@ module.exports = {
                             case -1:
                                 next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
                         }
+
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
                         next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
