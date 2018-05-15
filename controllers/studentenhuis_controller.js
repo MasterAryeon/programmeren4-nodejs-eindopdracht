@@ -7,6 +7,9 @@ const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
+const Studentenhuis = require('../domain/studentenhuis');
+const StudentenhuisResponse = require('../domain/studentenhuis_response');
+
 module.exports = {
 
     getStudentenhuisList(req, res, next){
@@ -88,8 +91,9 @@ module.exports = {
             const naam = req.body.naam || '';
             const adres = req.body.adres || '';
 
-            assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(adres !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
+            const studentenhuis = new Studentenhuis(naam, adres);
+
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
 
@@ -99,13 +103,14 @@ module.exports = {
                 statement.input('accountID', sql.Int);
                 statement.prepare('EXEC addStudentenhuis @naam, @adres, @accountID;').then(s => {
                     s.execute({
-                        naam: naam,
-                        adres: adres,
+                        naam: studentenhuis.naam,
+                        adres: studentenhuis.adres,
                         accountID: req.header.tokenid
                     }).then(result => {
                         s.unprepare();
 
-                        res.status(200).json(result.recordset).end();
+                        const row = result.recordset[0];
+                        res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
                         next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
@@ -131,9 +136,10 @@ module.exports = {
             const naam = req.body.naam || '';
             const adres = req.body.adres || '';
 
-            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
-            assert(adres !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+            const studentenhuis = new Studentenhuis(naam, adres);
+
+            assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+            assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {
@@ -146,8 +152,8 @@ module.exports = {
                 statement.prepare('EXEC updateStudentenhuis @huisID, @naam, @adres, @accountID;').then(s => {
                     s.execute({
                         huisID: huisId,
-                        naam: naam,
-                        adres: adres,
+                        naam: studentenhuis.naam,
+                        adres: studentenhuis.adres,
                         accountID: req.header.tokenid
                     }).then(result => {
                         s.unprepare();
@@ -156,13 +162,7 @@ module.exports = {
                         const update = row.result;
                         switch(update) {
                             case 1:
-                                res.status(200).json({
-                                    ID: row.ID,
-                                    naam: row.naam,
-                                    adres: row.adres,
-                                    contact: row.contact,
-                                    email: row.email
-                                }).end();
+                                res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
                                 break;
                             case 0:
                                 next(new ApiError(409,'Conflict (Gebruiker mag deze data niet aanpassen)'));
@@ -193,7 +193,8 @@ module.exports = {
 
         try {
             const huisId = req.params.id || -1;
-            assert(huisId >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
+            assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
+            assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
 
             const connection = new sql.ConnectionPool(config.sql);
             connection.connect().then(conn => {

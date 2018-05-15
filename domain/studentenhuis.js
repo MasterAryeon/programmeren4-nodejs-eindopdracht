@@ -2,12 +2,20 @@
     studentenhuis.js   -  studentenhuis class
  */
 
+const assert = require('assert');
+
 class studentenhuis {
 
     //Constructor for studentenhuis
-    constructor(name, adress){
-        this._name = name;
-        this._adress = adress;
+    constructor(naam, adres){
+
+        assert(naam !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+        assert(adres !== '', 'Een of meer properties in de request body ontbreken of zijn foutief');
+        assert(typeof(naam) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+        assert(typeof(adres) === 'string', 'Een of meer properties in de request body ontbreken of zijn foutief');
+
+        this.naam = naam;
+        this.adres = adres;
     }
 }
 
