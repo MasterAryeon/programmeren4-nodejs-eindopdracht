@@ -68,7 +68,7 @@ module.exports = {
         console.log('---------------A POST request was made---------------');
         console.log('-------------------POST deelnemer--------------------');
         try {
-            console.log(request.params);
+
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
@@ -149,7 +149,7 @@ module.exports = {
                     }).then(result => {
                         s.unprepare();
 
-                        if(result.recordset.length !== 0) {
+                        if(result.recordset !== undefined) {
                             if ('result' in result.recordset[0]) {
                                 switch(result.recordset[0].result) {
                                     case 0:

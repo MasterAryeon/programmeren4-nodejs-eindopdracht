@@ -111,7 +111,8 @@ module.exports = {
                         s.unprepare();
 
                         if(result.recordset[0].result === 1) {
-                            const token = auth.encodeToken(email);
+                            const accountId = result.recordset[0].id;
+                            const token = auth.encodeToken(accountId, email);
                             console.log(chalk.green('[MSSQL]    Account succesvol geregistreerd met email: ' + email));
                             response.status(200).json({
                                 token: token,
