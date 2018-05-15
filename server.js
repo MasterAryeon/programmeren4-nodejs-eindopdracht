@@ -21,7 +21,6 @@ const error_routes = require('./routes/error_routes');
 const studentenhuis_routes = require('./routes/studentenhuis_routes');
 const maaltijd_routes = require('./routes/maaltijd_routes');
 const deelnemer_routes = require('./routes/deelnemer_routes');
-const PLACEHOLDER_routes = require('./routes/PLACEHOLDER_routes');
 
 // Include necessary controllers
 const AuthController = require('./controllers/auth_controller');

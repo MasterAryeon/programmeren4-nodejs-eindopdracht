@@ -1,6 +1,6 @@
 const config = {
     port: 3000,
-    key: 'A7AE7964C08320310421D3629C84C49373FDCF241BED60B9B5466FB6FBE6179F',
+    key: process.env.DB_KEY,
     sql: {
         user: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
