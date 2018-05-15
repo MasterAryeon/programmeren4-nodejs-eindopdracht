@@ -13,10 +13,10 @@ let routes = express.Router();
 routes.get('/:id/maaltijd/:maaltijdId/deelnemer', deelnemer_controller.getDeelnemerList);
 
 //The POST deelnemer request
-routes.post(':id/maaltijd/:maaltijdId/deelnemer', deelnemer_controller.createDeelnemer);
+routes.post('/:id/maaltijd/:maaltijdId/deelnemer', deelnemer_controller.createDeelnemer);
 
 //The DELETE deelnemer request
-routes.delete(':id/maaltijd/:maaltijdId/deelnemer', deelnemer_controller.deleteDeelnemer);
+routes.delete('/:id/maaltijd/:maaltijdId/deelnemer', deelnemer_controller.deleteDeelnemer);
 
 
 module.exports = routes;
