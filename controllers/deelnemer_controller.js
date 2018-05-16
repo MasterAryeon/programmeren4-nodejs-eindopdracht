@@ -3,6 +3,7 @@
  */
 
 const sql = require('mssql');
+const db = require('../config/db');
 const assert = require('assert');
 const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
@@ -11,7 +12,7 @@ const chalk = require('chalk');
 const DeelnemerResponse = require('../domain/deelnemer_response');
 
 module.exports = {
-
+    // function used to get all deelnemers of a given maaltijdID of a given studentenhuisID from the database
     getDeelnemerList(request, response, next){
         console.log('---------------A GET request was made---------------');
         console.log('-------------------GET deelnemer--------------------');
@@ -22,9 +23,7 @@ module.exports = {
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('maaltijdID',sql.Int);
@@ -60,12 +59,11 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to add a deelnemer of a given maaltijdID of a given studentenhuisID from the database
     createDeelnemer(request, response, next){
         console.log('---------------A POST request was made---------------');
         console.log('-------------------POST deelnemer--------------------');
@@ -77,9 +75,7 @@ module.exports = {
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID',sql.Int);
@@ -120,12 +116,11 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to delete a deelnemer of a given maaltijdID of a given studentenhuisID from the database
     deleteDeelnemer(request, response, next){
         console.log('---------------A DELETE request was made---------------');
         console.log('-------------------DELETE deelnemer--------------------');
@@ -137,9 +132,7 @@ module.exports = {
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID',sql.Int);
@@ -183,7 +176,6 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }

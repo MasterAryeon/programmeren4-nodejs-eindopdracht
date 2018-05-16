@@ -3,6 +3,7 @@
  */
 const assert = require('assert');
 const sql = require('mssql');
+const db = require('../config/db');
 const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
@@ -11,15 +12,12 @@ const Studentenhuis = require('../domain/studentenhuis');
 const StudentenhuisResponse = require('../domain/studentenhuis_response');
 
 module.exports = {
-
+    // function used to get all studentenhuizen from the database
     getStudentenhuisList(req, res, next){
         console.log('-------------------A GET request was made-------------------');
         console.log('------------------Get all Studentenhuizen-------------------');
         try {
-
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.prepare('EXEC getStudentenhuizen;').then(s => {
                     s.execute({}).then(result => {
@@ -38,12 +36,12 @@ module.exports = {
             }).catch(err => {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
-            });
+            })
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to get all studentenhuis from the database by given ID
     getStudentenhuisById(req, res, next) {
         console.log('------------------A GET request was made-------------------');
         console.log('------------------Get studentenhuis by ID------------------');
@@ -52,9 +50,7 @@ module.exports = {
 
             assert(id >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('ID',sql.Int);
                 statement.prepare('EXEC getStudentenhuisById @ID;').then(s => {
@@ -85,6 +81,7 @@ module.exports = {
             next(new ApiError(412, error.message));
         }
     },
+    // function used to add a studentenhuis to the database
     createStudentenhuis (req, res, next) {
         console.log('----------------------A POST request was made---------------------');
         console.log('---------------Adding item to the studentenhuisList---------------');
@@ -96,9 +93,7 @@ module.exports = {
             assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
             const studentenhuis = new Studentenhuis(naam, adres);
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('naam', sql.NVarChar(32));
                 statement.input('adres', sql.NVarChar(32));
@@ -130,7 +125,7 @@ module.exports = {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to update a studentenhuis in the database
     putStudentenhuisById (req, res, next) {
         console.log('----------------------A PUT request was made---------------------');
         console.log('---------------updating item in the studentenhuisList---------------');
@@ -144,9 +139,7 @@ module.exports = {
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('naam', sql.NVarChar(32));
@@ -190,7 +183,7 @@ module.exports = {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to delete a studentenhuis in the database
     deleteStudentenhuisById(req, res, next){
         console.log('------------------A DELETE request was made-------------------');
         console.log('------------------Delete studentenhuis by ID------------------');
@@ -200,9 +193,7 @@ module.exports = {
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(req.header.tokenid >= 0, 'Een of meer properties in de request header ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID', sql.Int);
@@ -237,7 +228,6 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }
