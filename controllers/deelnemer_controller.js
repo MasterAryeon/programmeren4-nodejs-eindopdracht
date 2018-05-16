@@ -3,31 +3,34 @@
  */
 
 const sql = require('mssql');
+const db = require('../config/db');
 const assert = require('assert');
-const config = require('../config/config');
+
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
 const DeelnemerResponse = require('../domain/deelnemer_response');
 
 module.exports = {
-
+    // function used to get all deelnemers of a given maaltijdID of a given studentenhuisID from the database
     getDeelnemerList(request, response, next){
         console.log('---------------A GET request was made---------------');
         console.log('-------------------GET deelnemer--------------------');
         try {
+            // Set values and test them
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            // use the connection pool to execute the statement
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('maaltijdID',sql.Int);
+
+                // prepare the statement
                 statement.prepare('EXEC getDeelnemersFromMaaltijdId @huisID, @maaltijdID;').then(s => {
                     s.execute({
                         huisID: huisId,
@@ -35,6 +38,7 @@ module.exports = {
                     }).then(result => {
                         s.unprepare();
 
+                        // process the result
                         if(result.recordset.length !== 0) {
                             if ('result' in result.recordset[0]) {
                                 if (result.recordset[0].result === -1) {
@@ -60,30 +64,30 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to add a deelnemer of a given maaltijdID of a given studentenhuisID from the database
     createDeelnemer(request, response, next){
         console.log('---------------A POST request was made---------------');
         console.log('-------------------POST deelnemer--------------------');
         try {
-
+            // Set values and test them
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            // use the connection pool to execute the statement
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID',sql.Int);
                 statement.input('maaltijdID',sql.Int);
+
+                // prepare the statement
                 statement.prepare('EXEC addDeelnemer @huisID, @accountID, @maaltijdID;').then(s => {
                     s.execute({
                         huisID: huisId,
@@ -92,6 +96,7 @@ module.exports = {
                     }).then(result => {
                         s.unprepare();
 
+                        // process the result
                         if ('result' in result.recordset[0]) {
                             switch(result.recordset[0].result) {
                                 case 0:
@@ -106,7 +111,7 @@ module.exports = {
                             }
                         } else {
                             const row = result.recordset[0];
-                            response.status(200).json(new DeelnemerResponse(row.firstname, row.lastname, row.email)).end();
+                            response.status(200).json(new DeelnemerResponse(row.voornaam, row.achternaam, row.email)).end();
                         }
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
@@ -120,30 +125,30 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to delete a deelnemer of a given maaltijdID of a given studentenhuisID from the database
     deleteDeelnemer(request, response, next){
         console.log('---------------A DELETE request was made---------------');
         console.log('-------------------DELETE deelnemer--------------------');
         try {
-
+            // Set values and test them
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
-            const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
+            // use the connection pool to execute the statement
+            db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID',sql.Int);
                 statement.input('maaltijdID',sql.Int);
+
+                // prepare the statement
                 statement.prepare('EXEC deleteDeelnemer @huisID, @accountID, @maaltijdID;').then(s => {
                     s.execute({
                         huisID: huisId,
@@ -152,6 +157,7 @@ module.exports = {
                     }).then(result => {
                         s.unprepare();
 
+                        // process the result
                         if(result.recordset !== undefined) {
                             if ('result' in result.recordset[0]) {
                                 switch(result.recordset[0].result) {
@@ -183,7 +189,6 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }

@@ -11,7 +11,7 @@ let insertedMaaltijd;
 describe('Deelnemer API POST', function() {
     this.timeout(10000);
     before(() => {
-        validToken = require('../test/authentication.routes.test').token;
+        validToken = require('./authentication.routes.test').token;
         global.validothertoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyNjk2MjUsImlhdCI6MTUyNjQwNTYyNSwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.wXDTJf1_ikYxjYfQKBboy6s-s28aLWLPHJxkIzJB80g';
         global.invalidothertoken = 'yJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyNjk2MjUsImlhdCI6MTUyNjQwNTYyNSwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.wXDTJf1_ikYxjYfQKBboy6s-s28aLWLPHJxkIzJB80g';
     });
@@ -31,10 +31,10 @@ describe('Deelnemer API POST', function() {
 
                 const body = response.body;
                 body.should.have.property('ID');
-                body.should.have.property('naam');
-                body.should.have.property('adres');
-                body.should.have.property('contact');
-                body.should.have.property('email');
+                body.should.have.property('naam').equals('Thuis');
+                body.should.have.property('adres').equals('Lovendijksstraat, Breda');
+                body.should.have.property('contact').equals('Aron Cornet');
+                body.should.have.property('email').equals('aron@h-cornet.nl');
 
                 insertedStudentenhuis = body.ID;
                 done()
@@ -59,16 +59,16 @@ describe('Deelnemer API POST', function() {
 
                 const body = response.body;
                 body.should.have.property('ID');
-                body.should.have.property('naam');
-                body.should.have.property('beschrijving');
-                body.should.have.property('ingredienten');
-                body.should.have.property('allergie');
-                body.should.have.property('prijs');
+                body.should.have.property('naam').equals('Pizza');
+                body.should.have.property('beschrijving').equals('Lekker eten');
+                body.should.have.property('ingredienten').equals('deeg');
+                body.should.have.property('allergie').equals('zuivel');
+                body.should.have.property('prijs').equals(5);
 
                 insertedMaaltijd = body.ID;
                 done()
             });
-    })
+    });
     it('should throw an error when using invalid JWT token', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -94,13 +94,13 @@ describe('Deelnemer API POST', function() {
                 response.should.be.a('object');
 
                 const body = response.body;
-                body.should.have.property('firstname');
-                body.should.have.property('lastname');
-                body.should.have.property('email');
+                body.should.have.property('voornaam').equals('Aron');
+                body.should.have.property('achternaam').equals('Cornet');
+                body.should.have.property('email').equals('aron@h-cornet.nl');
 
                 done()
             });
-    })
+    });
     it('should return an error when using an non-existing huisId', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -115,7 +115,7 @@ describe('Deelnemer API POST', function() {
                 body.should.have.property('message').equals('Niet gevonden (huisId bestaat niet)');
                 done()
             });
-    })
+    });
     it('should return an error when using an non-existing maaltijdId', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -130,7 +130,7 @@ describe('Deelnemer API POST', function() {
                 body.should.have.property('message').equals('Niet gevonden (maaltijdId bestaat niet)');
                 done()
             });
-    })
+    });
     it('should return an error when trying to apply when already applied', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -146,8 +146,7 @@ describe('Deelnemer API POST', function() {
                 done()
             });
     })
-
-})
+});
 
 describe('Deelnemer API GET All', function() {
     this.timeout(10000);
@@ -176,7 +175,7 @@ describe('Deelnemer API GET All', function() {
                 response.should.have.status(200);
                 done()
             });
-    })
+    });
     it('should return an error when using an non-existing huisId', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -191,7 +190,7 @@ describe('Deelnemer API GET All', function() {
                 body.should.have.property('message').equals('Niet gevonden (huisId bestaat niet)');
                 done()
             });
-    })
+    });
     it('should return an error when using an non-existing maaltijdId', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -207,7 +206,7 @@ describe('Deelnemer API GET All', function() {
                 done()
             });
     })
-})
+});
 describe('Deelnemers API DELETE',function() {
     this.timeout(10000);
     it('should throw an error when using invalid JWT token', (done) => {
@@ -224,7 +223,7 @@ describe('Deelnemers API DELETE',function() {
                 body.should.have.property('message').equals('Unexpected token ȝ in JSON at position 0');
                 done()
             });
-    })
+    });
 
     it('should return a 200 OK when deleting a valid object', (done) => {
         setTimeout(done, 10000);
@@ -235,7 +234,7 @@ describe('Deelnemers API DELETE',function() {
                 response.should.have.status(200);
                 done()
             });
-    })
+    });
     it('should return an error when using an non-existing huisId', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -250,7 +249,7 @@ describe('Deelnemers API DELETE',function() {
                 body.should.have.property('message').equals('Niet gevonden (huisId bestaat niet)');
                 done()
             });
-    })
+    });
     it('should return an error when using an non-existing maaltijdId', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
@@ -266,4 +265,4 @@ describe('Deelnemers API DELETE',function() {
                 done()
             });
     })
-})
+});

@@ -18,6 +18,6 @@ routes.post('/:id/maaltijd/:maaltijdId/deelnemers', deelnemer_controller.createD
 //The DELETE deelnemer request
 routes.delete('/:id/maaltijd/:maaltijdId/deelnemers', deelnemer_controller.deleteDeelnemer);
 
-
+// Exporting the routes so they can be used by the other classes
 module.exports = routes;
 
