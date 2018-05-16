@@ -5,7 +5,6 @@ let routes = express.Router();
 // The router endpoints that we provide
 routes.post('/login', AuthController.login);
 routes.post('/register', AuthController.register);
-routes.post('/hash', AuthController.hashPassword);
 
-// Export the routes
+// Exporting the routes so they can be used by the other classes
 module.exports = routes;
