@@ -48,14 +48,14 @@ module.exports = {
         console.log('------------------A GET request was made-------------------');
         console.log('------------------Get studentenhuis by ID------------------');
         try {
-            const id = req.params.id || -1;
+            const id = req.params.id || -1; //const using the id from the requests URL or giving it the value -1
 
             assert(id >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
 
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('ID',sql.Int);
-                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => { //Preparing an SQL statements to prevent SQL Injection Error
+                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         ID: id
                     }).then(result => {
@@ -102,7 +102,7 @@ module.exports = {
                 statement.input('naam', sql.NVarChar(32));
                 statement.input('adres', sql.NVarChar(32));
                 statement.input('accountID', sql.Int);
-                statement.prepare('EXEC addStudentenhuis @naam, @adres, @accountID;').then(s => {
+                statement.prepare('EXEC addStudentenhuis @naam, @adres, @accountID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         naam: studentenhuis.naam,
                         adres: studentenhuis.adres,
@@ -111,7 +111,7 @@ module.exports = {
                         s.unprepare();
 
                         const row = result.recordset[0];
-                        res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
+                        res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end(); //Responding to the request
 
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
@@ -149,7 +149,7 @@ module.exports = {
                 statement.input('naam', sql.NVarChar(32));
                 statement.input('adres', sql.NVarChar(32));
                 statement.input('accountID', sql.Int);
-                statement.prepare('EXEC updateStudentenhuis @huisID, @naam, @adres, @accountID;').then(s => {
+                statement.prepare('EXEC updateStudentenhuis @huisID, @naam, @adres, @accountID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         huisID: huisId,
                         naam: studentenhuis.naam,
@@ -162,7 +162,7 @@ module.exports = {
                         const update = row.result;
                         switch(update) {
                             case 1:
-                                res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
+                                res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end(); //Responding to the request
                                 break;
                             case 0:
                                 next(new ApiError(409,'Conflict (Gebruiker mag deze data niet aanpassen)'));
@@ -201,7 +201,7 @@ module.exports = {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID', sql.Int);
-                statement.prepare('EXEC deleteStudentenhuisById @huisID, @accountID;').then(s => {
+                statement.prepare('EXEC deleteStudentenhuisById @huisID, @accountID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         huisID: huisId,
                         accountID: req.header.tokenid
@@ -211,7 +211,7 @@ module.exports = {
                         const deletion = result.recordset[0].result;
                         switch(deletion) {
                             case 1:
-                                res.status(200).json({}).end();
+                                res.status(200).json({}).end(); //Response to the request
                                 break;
                             case 0:
                                 next(new ApiError(409,'Conflict (Gebruiker mag deze data niet verwijderen)'));
