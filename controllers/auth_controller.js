@@ -30,9 +30,11 @@ module.exports = {
     // function used for logging in the user
     login(request, response, next) {
         try {
+            //making constants with the email and password from the request's body
             const email = request.body.email || '';
             const password = request.body.password || '';
 
+            //creating a login with the created email en login
             const userlogin = new UserLogin(email, password);
 
             db.then(conn => {
@@ -90,7 +92,7 @@ module.exports = {
                 statement.input('password', sql.NVarChar(100));
                 statement.input('firstname', sql.NVarChar(32));
                 statement.input('lastname', sql.NVarChar(32));
-                statement.prepare('EXEC registerAccount @email, @password, @firstname, @lastname;').then(s => {
+                statement.prepare('EXEC registerAccount @email, @password, @firstname, @lastname;').then(s => { //preparing  a statements
                     s.execute({
                         email: userRegistration.email,
                         password: auth.hashPassword(userRegistration.password),

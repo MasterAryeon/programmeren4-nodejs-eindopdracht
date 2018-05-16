@@ -1,6 +1,8 @@
 /*
     studentenhuis_controller.js   -   Controller for the requests for studentenhuis
  */
+
+//Requires for the used modules and files
 const assert = require('assert');
 const sql = require('mssql');
 const db = require('../config/db');
@@ -19,11 +21,11 @@ module.exports = {
         try {
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
-                statement.prepare('EXEC getStudentenhuizen;').then(s => {
+                statement.prepare('EXEC getStudentenhuizen;').then(s => { //Preparing an SQL statements to prevent SQL Injection Error
                     s.execute({}).then(result => {
                         s.unprepare();
 
-                        res.status(200).json(result.recordset).end();
+                        res.status(200).json(result.recordset).end(); //Response to the request
 
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
@@ -53,14 +55,15 @@ module.exports = {
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('ID',sql.Int);
-                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => {
+                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => { //Preparing an SQL statements to prevent SQL Injection Error
                     s.execute({
                         ID: id
                     }).then(result => {
                         s.unprepare();
 
                         if(result.recordset.length !== 0) {
-                            res.status(200).json(result.recordset[0]).end();
+                            res.status(200).json(result.recordset[0]).end(); //Response to the request
+
                         } else {
                             next(new ApiError(404,'Niet gevonden (huisId bestaat niet)'));
                         }
@@ -87,6 +90,7 @@ module.exports = {
         console.log('---------------Adding item to the studentenhuisList---------------');
 
         try {
+            //Creating constants filled with empty strings or the requested items from the body
             const naam = req.body.naam || '';
             const adres = req.body.adres || '';
 
