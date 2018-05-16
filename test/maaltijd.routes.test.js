@@ -10,7 +10,7 @@ let insertedMaaltijd;
 
 describe('Maaltijd API POST', function() {
     before(() => {
-        validToken = require('../test/authentication.routes.test').token;
+        validToken = require('./authentication.routes.test').token;
         global.validothertoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyNjk2MjUsImlhdCI6MTUyNjQwNTYyNSwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.wXDTJf1_ikYxjYfQKBboy6s-s28aLWLPHJxkIzJB80g';
         global.invalidothertoken = 'yJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyNjk2MjUsImlhdCI6MTUyNjQwNTYyNSwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.wXDTJf1_ikYxjYfQKBboy6s-s28aLWLPHJxkIzJB80g';
     });
@@ -459,6 +459,50 @@ describe('Maaltijd API PUT', function() {
                 const body = response.body;
                 body.should.have.property('status').equals(412);
                 body.should.have.property('message').equals('Een of meer properties ontbreken of zijn foutief');
+                done()
+            });
+    })
+    it('should return an error when using an non-existing huisId', (done) => {
+        setTimeout(done, 10000);
+        chai.request(server)
+            .put('/api/studentenhuis/9999/maaltijd/' + insertedMaaltijd)
+            .send({
+                naam: "Pizza",
+                beschrijving: "Lekker eten",
+                ingredienten: "deeg",
+                allergie: 'zuivel',
+                prijs: 5
+            })
+            .set('x-access-token',validToken)
+            .end((error, response) => {
+                response.should.have.status(404);
+                response.should.be.a('object');
+
+                const body = response.body;
+                body.should.have.property('status').equals(404);
+                body.should.have.property('message').equals('Niet gevonden (huisId bestaat niet)');
+                done()
+            });
+    })
+    it('should return an error when using an non-existing maaltijdId', (done) => {
+        setTimeout(done, 10000);
+        chai.request(server)
+            .delete('/api/studentenhuis/' + insertedStudentenhuis + '/maaltijd/9999')
+            .send({
+                naam: "Pizza",
+                beschrijving: "Lekker eten",
+                ingredienten: "deeg",
+                allergie: 'zuivel',
+                prijs: 5
+            })
+            .set('x-access-token',validToken)
+            .end((error, response) => {
+                response.should.have.status(404);
+                response.should.be.a('object');
+
+                const body = response.body;
+                body.should.have.property('status').equals(404);
+                body.should.have.property('message').equals('Niet gevonden (maaltijdId bestaat niet)');
                 done()
             });
     })

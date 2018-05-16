@@ -9,7 +9,7 @@ let insertedStudentenhuis;
 
 describe('Studentenhuis API POST', function() {
     before(() => {
-        validToken = require('../test/authentication.routes.test').token;
+        validToken = require('./authentication.routes.test').token;
         global.validothertoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyODE0NTQsImlhdCI6MTUyNjQxNzQ1NCwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.n6uEAzojz2TfXi5UzDweWIJOdNbiWbTe9MtY27iM-8o';
         global.invalidothertoken = 'yJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyODE0NTQsImlhdCI6MTUyNjQxNzQ1NCwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.n6uEAzojz2TfXi5UzDweWIJOdNbiWbTe9MtY27iM-8o';
     });

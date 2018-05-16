@@ -11,7 +11,7 @@ let insertedMaaltijd;
 describe('Deelnemer API POST', function() {
     this.timeout(10000);
     before(() => {
-        validToken = require('../test/authentication.routes.test').token;
+        validToken = require('./authentication.routes.test').token;
         global.validothertoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyNjk2MjUsImlhdCI6MTUyNjQwNTYyNSwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.wXDTJf1_ikYxjYfQKBboy6s-s28aLWLPHJxkIzJB80g';
         global.invalidothertoken = 'yJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjcyNjk2MjUsImlhdCI6MTUyNjQwNTYyNSwic3ViIjoxMiwiZW1haWwiOiJyYXdoYW1lcnNAYXZhbnMubmwifQ.wXDTJf1_ikYxjYfQKBboy6s-s28aLWLPHJxkIzJB80g';
     });
