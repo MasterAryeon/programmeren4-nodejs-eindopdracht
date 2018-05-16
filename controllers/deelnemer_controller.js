@@ -5,7 +5,7 @@
 const sql = require('mssql');
 const db = require('../config/db');
 const assert = require('assert');
-const config = require('../config/config');
+
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
@@ -17,16 +17,20 @@ module.exports = {
         console.log('---------------A GET request was made---------------');
         console.log('-------------------GET deelnemer--------------------');
         try {
+            // Set values and test them
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
+            // use the connection pool to execute the statement
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('maaltijdID',sql.Int);
+
+                // prepare the statement
                 statement.prepare('EXEC getDeelnemersFromMaaltijdId @huisID, @maaltijdID;').then(s => {
                     s.execute({
                         huisID: huisId,
@@ -34,6 +38,7 @@ module.exports = {
                     }).then(result => {
                         s.unprepare();
 
+                        // process the result
                         if(result.recordset.length !== 0) {
                             if ('result' in result.recordset[0]) {
                                 if (result.recordset[0].result === -1) {
@@ -75,11 +80,14 @@ module.exports = {
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
+            // use the connection pool to execute the statement
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID',sql.Int);
                 statement.input('maaltijdID',sql.Int);
+
+                // prepare the statement
                 statement.prepare('EXEC addDeelnemer @huisID, @accountID, @maaltijdID;').then(s => {
                     s.execute({
                         huisID: huisId,
@@ -88,6 +96,7 @@ module.exports = {
                     }).then(result => {
                         s.unprepare();
 
+                        // process the result
                         if ('result' in result.recordset[0]) {
                             switch(result.recordset[0].result) {
                                 case 0:
@@ -132,11 +141,14 @@ module.exports = {
             assert(huisId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
             assert(maaltijdId >= 0, 'Een of meer properties in de request parameters ontbreken of zijn foutief');
 
+            // use the connection pool to execute the statement
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID',sql.Int);
                 statement.input('maaltijdID',sql.Int);
+
+                // prepare the statement
                 statement.prepare('EXEC deleteDeelnemer @huisID, @accountID, @maaltijdID;').then(s => {
                     s.execute({
                         huisID: huisId,
@@ -145,6 +157,7 @@ module.exports = {
                     }).then(result => {
                         s.unprepare();
 
+                        // process the result
                         if(result.recordset !== undefined) {
                             if ('result' in result.recordset[0]) {
                                 switch(result.recordset[0].result) {
