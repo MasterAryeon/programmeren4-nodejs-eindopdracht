@@ -73,7 +73,7 @@ module.exports = {
         console.log('---------------A POST request was made---------------');
         console.log('-------------------POST deelnemer--------------------');
         try {
-
+            // Set values and test them
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
@@ -134,7 +134,7 @@ module.exports = {
         console.log('---------------A DELETE request was made---------------');
         console.log('-------------------DELETE deelnemer--------------------');
         try {
-
+            // Set values and test them
             const huisId = request.params.id || -1;
             const maaltijdId = request.params.maaltijdId || -1;
 
