@@ -24,5 +24,6 @@ routes.put('/:id', studentenhuis_controller.putStudentenhuisById);
 //The DELETE studentenhuis by Id request
 routes.delete('/:id', studentenhuis_controller.deleteStudentenhuisById);
 
+// Exporting the routes so they can be used by the other classes
 module.exports = routes;
 

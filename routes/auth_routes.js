@@ -6,5 +6,5 @@ let routes = express.Router();
 routes.post('/login', AuthController.login);
 routes.post('/register', AuthController.register);
 
-// Export the routes
+// Exporting the routes so they can be used by the other classes
 module.exports = routes;
