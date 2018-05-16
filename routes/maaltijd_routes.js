@@ -24,5 +24,6 @@ routes.put('/:id/maaltijd/:maaltijdId', maaltijd_controller.putMaaltijdById);
 //The DELETE maaltijd by Id request
 routes.delete('/:id/maaltijd/:maaltijdId', maaltijd_controller.deleteMaaltijdById);
 
+// Exporting the routes so they can be used by the other classes
 module.exports = routes;
 

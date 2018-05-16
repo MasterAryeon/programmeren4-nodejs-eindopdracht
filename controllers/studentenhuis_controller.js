@@ -1,10 +1,12 @@
 /*
     studentenhuis_controller.js   -   Controller for the requests for studentenhuis
  */
+
+//Requires for the used modules and files
 const assert = require('assert');
 const sql = require('mssql');
 const db = require('../config/db');
-const config = require('../config/config');
+
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
@@ -19,11 +21,11 @@ module.exports = {
         try {
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
-                statement.prepare('EXEC getStudentenhuizen;').then(s => {
+                statement.prepare('EXEC getStudentenhuizen;').then(s => { //Preparing an SQL statements to prevent SQL Injection Error
                     s.execute({}).then(result => {
                         s.unprepare();
 
-                        res.status(200).json(result.recordset).end();
+                        res.status(200).json(result.recordset).end(); //Response to the request
 
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
@@ -46,21 +48,22 @@ module.exports = {
         console.log('------------------A GET request was made-------------------');
         console.log('------------------Get studentenhuis by ID------------------');
         try {
-            const id = req.params.id || -1;
+            const id = req.params.id || -1; //const using the id from the requests URL or giving it the value -1
 
             assert(id >= 0, 'Een of meer properties in de request body ontbreken of zijn foutief');
 
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('ID',sql.Int);
-                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => {
+                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         ID: id
                     }).then(result => {
                         s.unprepare();
 
                         if(result.recordset.length !== 0) {
-                            res.status(200).json(result.recordset[0]).end();
+                            res.status(200).json(result.recordset[0]).end(); //Response to the request
+
                         } else {
                             next(new ApiError(404,'Niet gevonden (huisId bestaat niet)'));
                         }
@@ -87,6 +90,7 @@ module.exports = {
         console.log('---------------Adding item to the studentenhuisList---------------');
 
         try {
+            //Creating constants filled with empty strings or the requested items from the body
             const naam = req.body.naam || '';
             const adres = req.body.adres || '';
 
@@ -98,7 +102,7 @@ module.exports = {
                 statement.input('naam', sql.NVarChar(32));
                 statement.input('adres', sql.NVarChar(32));
                 statement.input('accountID', sql.Int);
-                statement.prepare('EXEC addStudentenhuis @naam, @adres, @accountID;').then(s => {
+                statement.prepare('EXEC addStudentenhuis @naam, @adres, @accountID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         naam: studentenhuis.naam,
                         adres: studentenhuis.adres,
@@ -107,7 +111,7 @@ module.exports = {
                         s.unprepare();
 
                         const row = result.recordset[0];
-                        res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
+                        res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end(); //Responding to the request
 
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));
@@ -145,7 +149,7 @@ module.exports = {
                 statement.input('naam', sql.NVarChar(32));
                 statement.input('adres', sql.NVarChar(32));
                 statement.input('accountID', sql.Int);
-                statement.prepare('EXEC updateStudentenhuis @huisID, @naam, @adres, @accountID;').then(s => {
+                statement.prepare('EXEC updateStudentenhuis @huisID, @naam, @adres, @accountID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         huisID: huisId,
                         naam: studentenhuis.naam,
@@ -158,7 +162,7 @@ module.exports = {
                         const update = row.result;
                         switch(update) {
                             case 1:
-                                res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
+                                res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end(); //Responding to the request
                                 break;
                             case 0:
                                 next(new ApiError(409,'Conflict (Gebruiker mag deze data niet aanpassen)'));
@@ -197,7 +201,7 @@ module.exports = {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('huisID',sql.Int);
                 statement.input('accountID', sql.Int);
-                statement.prepare('EXEC deleteStudentenhuisById @huisID, @accountID;').then(s => {
+                statement.prepare('EXEC deleteStudentenhuisById @huisID, @accountID;').then(s => { //Preparing an SQL statement to prevent SQL Injection
                     s.execute({
                         huisID: huisId,
                         accountID: req.header.tokenid
@@ -207,7 +211,7 @@ module.exports = {
                         const deletion = result.recordset[0].result;
                         switch(deletion) {
                             case 1:
-                                res.status(200).json({}).end();
+                                res.status(200).json({}).end(); //Response to the request
                                 break;
                             case 0:
                                 next(new ApiError(409,'Conflict (Gebruiker mag deze data niet verwijderen)'));
