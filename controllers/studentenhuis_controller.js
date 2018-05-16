@@ -12,7 +12,7 @@ const Studentenhuis = require('../domain/studentenhuis');
 const StudentenhuisResponse = require('../domain/studentenhuis_response');
 
 module.exports = {
-
+    // function used to get all studentenhuizen from the database
     getStudentenhuisList(req, res, next){
         console.log('-------------------A GET request was made-------------------');
         console.log('------------------Get all Studentenhuizen-------------------');
@@ -37,35 +37,11 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             })
-
-
-            /*const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
-                const statement = new sql.PreparedStatement(conn);
-                statement.prepare('EXEC getStudentenhuizen;').then(s => {
-                    s.execute({}).then(result => {
-                        s.unprepare();
-
-                        res.status(200).json(result.recordset).end();
-
-                    }).catch( err => {
-                        console.log(chalk.red('[MSSQL]    ' + err.message));
-                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                    });
-                }).catch(err => {
-                    console.log(chalk.red('[MSSQL]    ' + err.message));
-                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                });
-            }).catch(err => {
-                console.log(chalk.red('[MSSQL]    ' + err.message));
-                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
-            });*/
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to get all studentenhuis from the database by given ID
     getStudentenhuisById(req, res, next) {
         console.log('------------------A GET request was made-------------------');
         console.log('------------------Get studentenhuis by ID------------------');
@@ -101,40 +77,11 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
-            /*const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
-                const statement = new sql.PreparedStatement(conn);
-                statement.input('ID',sql.Int);
-                statement.prepare('EXEC getStudentenhuisById @ID;').then(s => {
-                    s.execute({
-                        ID: id
-                    }).then(result => {
-                        s.unprepare();
-
-                        if(result.recordset.length !== 0) {
-                            res.status(200).json(result.recordset[0]).end();
-                        } else {
-                            next(new ApiError(404,'Niet gevonden (huisId bestaat niet)'));
-                        }
-
-                    }).catch( err => {
-                        console.log(chalk.red('[MSSQL]    ' + err.message));
-                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                    });
-                }).catch(err => {
-                    console.log(chalk.red('[MSSQL]    ' + err.message));
-                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                });
-            }).catch(err => {
-                console.log(chalk.red('[MSSQL]    ' + err.message));
-                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
-            });*/
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
+    // function used to add a studentenhuis to the database
     createStudentenhuis (req, res, next) {
         console.log('----------------------A POST request was made---------------------');
         console.log('---------------Adding item to the studentenhuisList---------------');
@@ -174,42 +121,11 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
-            /*const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
-                const statement = new sql.PreparedStatement(conn);
-                statement.input('naam', sql.NVarChar(32));
-                statement.input('adres', sql.NVarChar(32));
-                statement.input('accountID', sql.Int);
-                statement.prepare('EXEC addStudentenhuis @naam, @adres, @accountID;').then(s => {
-                    s.execute({
-                        naam: studentenhuis.naam,
-                        adres: studentenhuis.adres,
-                        accountID: req.header.tokenid
-                    }).then(result => {
-                        s.unprepare();
-
-                        const row = result.recordset[0];
-                        res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
-
-                    }).catch( err => {
-                        console.log(chalk.red('[MSSQL]    ' + err.message));
-                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                    });
-                }).catch(err => {
-                    console.log(chalk.red('[MSSQL]    ' + err.message));
-                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                });
-            }).catch(err => {
-                console.log(chalk.red('[MSSQL]    ' + err.message));
-                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
-            });*/
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to update a studentenhuis in the database
     putStudentenhuisById (req, res, next) {
         console.log('----------------------A PUT request was made---------------------');
         console.log('---------------updating item in the studentenhuisList---------------');
@@ -263,54 +179,11 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
-            /*const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
-                const statement = new sql.PreparedStatement(conn);
-                statement.input('huisID',sql.Int);
-                statement.input('naam', sql.NVarChar(32));
-                statement.input('adres', sql.NVarChar(32));
-                statement.input('accountID', sql.Int);
-                statement.prepare('EXEC updateStudentenhuis @huisID, @naam, @adres, @accountID;').then(s => {
-                    s.execute({
-                        huisID: huisId,
-                        naam: studentenhuis.naam,
-                        adres: studentenhuis.adres,
-                        accountID: req.header.tokenid
-                    }).then(result => {
-                        s.unprepare();
-
-                        const row = result.recordset[0];
-                        const update = row.result;
-                        switch(update) {
-                            case 1:
-                                res.status(200).json(new StudentenhuisResponse(row.ID, row.naam, row.adres, row.contact, row.email)).end();
-                                break;
-                            case 0:
-                                next(new ApiError(409,'Conflict (Gebruiker mag deze data niet aanpassen)'));
-                                break;
-                            case -1:
-                                next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
-                        }
-
-                    }).catch( err => {
-                        console.log(chalk.red('[MSSQL]    ' + err.message));
-                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                    });
-                }).catch(err => {
-                    console.log(chalk.red('[MSSQL]    ' + err.message));
-                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                });
-            }).catch(err => {
-                console.log(chalk.red('[MSSQL]    ' + err.message));
-                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
-            });*/
         } catch(error) {
             next(new ApiError(412, error.message));
         }
     },
-
+    // function used to delete a studentenhuis in the database
     deleteStudentenhuisById(req, res, next){
         console.log('------------------A DELETE request was made-------------------');
         console.log('------------------Delete studentenhuis by ID------------------');
@@ -355,45 +228,6 @@ module.exports = {
                 console.log(chalk.red('[MSSQL]    ' + err.message));
                 next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
             });
-
-            /*const connection = new sql.ConnectionPool(config.sql);
-            connection.connect().then(conn => {
-
-                const statement = new sql.PreparedStatement(conn);
-                statement.input('huisID',sql.Int);
-                statement.input('accountID', sql.Int);
-                statement.prepare('EXEC deleteStudentenhuisById @huisID, @accountID;').then(s => {
-                    s.execute({
-                        huisID: huisId,
-                        accountID: req.header.tokenid
-                    }).then(result => {
-                        s.unprepare();
-
-                        const deletion = result.recordset[0].result;
-                        switch(deletion) {
-                            case 1:
-                                res.status(200).json({}).end();
-                                break;
-                            case 0:
-                                next(new ApiError(409,'Conflict (Gebruiker mag deze data niet verwijderen)'));
-                                break;
-                            case -1:
-                                next(new ApiError(404, 'Niet gevonden (huisId bestaat niet)'));
-                        }
-
-                    }).catch( err => {
-                        console.log(chalk.red('[MSSQL]    ' + err.message));
-                        next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                    });
-                }).catch(err => {
-                    console.log(chalk.red('[MSSQL]    ' + err.message));
-                    next(new ApiError(500, 'Er heeft een interne fout opgetreden. Probeer het later opnieuw'));
-                });
-            }).catch(err => {
-                console.log(chalk.red('[MSSQL]    ' + err.message));
-                next(new ApiError(500, 'Er is op dit moment geen verbinding met de database. Probeer het later opnieuw'));
-            });*/
-
         } catch(error) {
             next(new ApiError(412, error.message));
         }

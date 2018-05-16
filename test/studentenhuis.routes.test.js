@@ -48,18 +48,15 @@ describe('Studentenhuis API POST', function() {
 
                 const body = response.body;
                 body.should.have.property('ID');
-                body.should.have.property('naam');
-                body.should.have.property('adres');
-                body.should.have.property('contact');
-                body.should.have.property('email');
+                body.should.have.property('naam').equals('Thuis');
+                body.should.have.property('adres').equals('Lovendijksstraat, Breda');
+                body.should.have.property('contact').equals('Aron Cornet');
+                body.should.have.property('email').equals('aron@h-cornet.nl');
 
                 insertedStudentenhuis = body.ID;
-                module.exports = {
-                    token: validToken
-                }
                 done()
             });
-    })
+    });
 
     it('should throw an error when naam is missing', (done) => {
         setTimeout(done, 10000);
@@ -79,7 +76,7 @@ describe('Studentenhuis API POST', function() {
                 body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
                 done()
             });
-    })
+    });
 
     it('should throw an error when adres is missing', (done) => {
         setTimeout(done, 10000);
@@ -99,7 +96,7 @@ describe('Studentenhuis API POST', function() {
                 done()
             });
     })
-})
+});
 
 describe('Studentenhuis API GET all', function() {
     this.timeout(10000);
@@ -126,10 +123,11 @@ describe('Studentenhuis API GET all', function() {
             .set('x-access-token',validToken)
             .end((error, response) => {
                 response.should.have.status(200);
+                response.body.should.be.a('array');
                 done()
             });
     })
-})
+});
 
 describe('Studentenhuis API GET one', function() {
     this.timeout(10000);
@@ -147,7 +145,7 @@ describe('Studentenhuis API GET one', function() {
                 body.should.have.property('message').equals('Unexpected token ȝ in JSON at position 0');
                 done()
             });
-    })
+    });
 
     it('should return the correct studentenhuis when using an existing huisId', (done) => {
         setTimeout(done, 10000);
@@ -161,13 +159,13 @@ describe('Studentenhuis API GET one', function() {
                 const body = response.body;
 
                 body.should.have.property('ID');
-                body.should.have.property('naam');
-                body.should.have.property('adres');
-                body.should.have.property('contact');
-                body.should.have.property('email');
+                body.should.have.property('naam').equals('Thuis');
+                body.should.have.property('adres').equals('Lovendijksstraat, Breda');
+                body.should.have.property('contact').equals('Aron Cornet');
+                body.should.have.property('email').equals('aron@h-cornet.nl');
                 done()
             });
-    })
+    });
 
     it('should return an error when using an non-existing huisId', (done) => {
         setTimeout(done, 10000);
@@ -184,7 +182,7 @@ describe('Studentenhuis API GET one', function() {
                 done()
             });
     })
-})
+});
 
 describe('Studentenhuis API PUT', function() {
     this.timeout(10000);
@@ -206,7 +204,7 @@ describe('Studentenhuis API PUT', function() {
                 body.should.have.property('message').equals('Unexpected token ȝ in JSON at position 0');
                 done()
             });
-    })
+    });
 
     it('should return a studentenhuis with ID when posting a valid object', (done) => {
         setTimeout(done, 10000);
@@ -224,13 +222,13 @@ describe('Studentenhuis API PUT', function() {
                 const body = response.body;
 
                 body.should.have.property('ID');
-                body.should.have.property('naam');
-                body.should.have.property('adres');
-                body.should.have.property('contact');
-                body.should.have.property('email');
+                body.should.have.property('naam').equals('Werk');
+                body.should.have.property('adres').equals('Hogeschoollaan, Breda');
+                body.should.have.property('contact').equals('Aron Cornet');
+                body.should.have.property('email').equals('aron@h-cornet.nl');
                 done()
             });
-    })
+    });
 
     it('should throw an error when naam is missing', (done) => {
         setTimeout(done, 10000);
@@ -249,7 +247,7 @@ describe('Studentenhuis API PUT', function() {
                 body.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
                 done()
             });
-    })
+    });
 
     it('should throw an error when adres is missing', (done) => {
         setTimeout(done, 10000);
@@ -286,7 +284,7 @@ describe('Studentenhuis API PUT', function() {
                     body.should.have.property('message').equals('Conflict (Gebruiker mag deze data niet aanpassen)');
                     done()
                 });
-        })
+        });
         it('should throw an error when trying to delete a non existing huisId', (done) => {
             setTimeout(done, 10000);
             chai.request(server)
@@ -307,7 +305,7 @@ describe('Studentenhuis API PUT', function() {
                 });
         })
     })
-})
+});
 
 describe('Studentenhuis API DELETE', function() {
     this.timeout(10000);
@@ -325,16 +323,12 @@ describe('Studentenhuis API DELETE', function() {
                 body.should.have.property('message').equals('Unexpected token ȝ in JSON at position 0');
                 done()
             });
-    })
+    });
 
     it('should throw an error when trying to delete without permission', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
             .delete('/api/studentenhuis/' + insertedStudentenhuis)
-            .send({
-                naam: "Thuis",
-                adres: "Lovendijksstraat, Breda",
-            })
             .set('x-access-token',global.validothertoken)
             .end((error, response) => {
                 response.should.have.status(409);
@@ -345,15 +339,11 @@ describe('Studentenhuis API DELETE', function() {
                 body.should.have.property('message').equals('Conflict (Gebruiker mag deze data niet verwijderen)');
                 done()
             });
-    })
+    });
     it('should throw an error when trying to delete a non existing huisId', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
             .delete('/api/studentenhuis/9999')
-            .send({
-                naam: "Thuis",
-                adres: "Lovendijksstraat, Breda",
-            })
             .set('x-access-token',validToken)
             .end((error, response) => {
                 response.should.have.status(404);
@@ -364,19 +354,15 @@ describe('Studentenhuis API DELETE', function() {
                 body.should.have.property('message').equals('Niet gevonden (huisId bestaat niet)');
                 done()
             });
-    })
+    });
     it('should return a studentenhuis when posting a valid object', (done) => {
         setTimeout(done, 10000);
         chai.request(server)
             .delete('/api/studentenhuis/' + insertedStudentenhuis)
-            .send({
-                naam: "Thuis",
-                adres: "Lovendijksstraat, Breda",
-            })
             .set('x-access-token',validToken)
             .end((error, response) => {
                 response.should.have.status(200);
                 done()
             });
     })
-})
+});
