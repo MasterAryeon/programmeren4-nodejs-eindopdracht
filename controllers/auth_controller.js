@@ -1,10 +1,8 @@
-const assert = require('assert');
 const chalk = require('chalk');
 const sql = require('mssql');
 const db = require('../config/db');
 
 const auth = require('../utils/auth/authentication');
-const config = require('../config/config');
 const ApiError = require('../domain/ApiError');
 
 const UserLogin = require('../domain/user_login_JSON');
@@ -16,7 +14,7 @@ module.exports = {
     validateToken(request, response, next) {
         console.log(chalk.yellow('[TOKEN]    Validatie van token verzocht'));
         const token = request.header('x-access-token') || '';
-
+        // decode the token and process it
         auth.decodeToken(token, (error, payload) => {
             if(error) {
                 next(new ApiError(401, error.message));
@@ -37,18 +35,20 @@ module.exports = {
             //creating a login with the created email en login
             const userlogin = new UserLogin(email, password);
 
+            // use the connection pool to execute the statement
             db.then(conn => {
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('email', sql.NVarChar(32));
                 statement.input('password', sql.NVarChar(100));
 
+                // prepare the statement
                 statement.prepare('EXEC loginAccount @email, @password;').then(s => {
                     s.execute({
                         email: userlogin.email,
                         password: auth.hashPassword(userlogin.password)
                     }).then(result => {
                         s.unprepare();
-
+                        // process the result
                         if(result.recordset[0].result === 1) {
                             const accountId = result.recordset[0].id;
                             const validtoken = new ValidToken(auth.encodeToken(accountId, userlogin.email), userlogin.email);
@@ -85,13 +85,18 @@ module.exports = {
             const firstname = request.body.firstname || '';
             const lastname = request.body.lastname || '';
 
+            // check the input values
             const userRegistration = new UserRegister(firstname, lastname, email, password);
+            // use the connection pool to execute the statement
             db.then(conn => {
+                // create the statement and bind values
                 const statement = new sql.PreparedStatement(conn);
                 statement.input('email', sql.NVarChar(32));
                 statement.input('password', sql.NVarChar(100));
                 statement.input('firstname', sql.NVarChar(32));
                 statement.input('lastname', sql.NVarChar(32));
+
+                // prepare the statement
                 statement.prepare('EXEC registerAccount @email, @password, @firstname, @lastname;').then(s => { //preparing  a statements
                     s.execute({
                         email: userRegistration.email,
@@ -100,6 +105,8 @@ module.exports = {
                         lastname: userRegistration.lastname
                     }).then(result => {
                         s.unprepare();
+
+                        // process the result
                         if(result.recordset[0].result === 1) {
                             const accountId = result.recordset[0].id;
                             const validtoken = new ValidToken(auth.encodeToken(accountId, userRegistration.email), userRegistration.email);
