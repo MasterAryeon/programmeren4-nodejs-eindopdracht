@@ -6,7 +6,7 @@
 const assert = require('assert');
 const sql = require('mssql');
 const db = require('../config/db');
-const config = require('../config/config');
+
 const ApiError = require('../domain/ApiError');
 const chalk = require('chalk');
 
