@@ -111,7 +111,7 @@ module.exports = {
                             }
                         } else {
                             const row = result.recordset[0];
-                            response.status(200).json(new DeelnemerResponse(row.firstname, row.lastname, row.email)).end();
+                            response.status(200).json(new DeelnemerResponse(row.voornaam, row.achternaam, row.email)).end();
                         }
                     }).catch( err => {
                         console.log(chalk.red('[MSSQL]    ' + err.message));

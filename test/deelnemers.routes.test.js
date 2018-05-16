@@ -94,8 +94,8 @@ describe('Deelnemer API POST', function() {
                 response.should.be.a('object');
 
                 const body = response.body;
-                body.should.have.property('firstname').equals('Aron');
-                body.should.have.property('lastname').equals('Cornet');
+                body.should.have.property('voornaam').equals('Aron');
+                body.should.have.property('achternaam').equals('Cornet');
                 body.should.have.property('email').equals('aron@h-cornet.nl');
 
                 done()
